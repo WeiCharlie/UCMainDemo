@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.kido.ucmaindemo.widget.refresh.KSwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:id="@+id/root_refresh_layout"
+    app:ksrl_indicator_normal_background="@color/colorPrimary"
+    app:ksrl_indicator_normal_foreground="@color/colorPrimaryIcons"
+    app:ksrl_indicator_terminal_background="@color/colorAccent"
+    app:ksrl_indicator_terminal_foreground="@color/colorPrimaryIcons"
+    app:ksrl_terminal_enable="true"
+    android:layout_height="match_parent">
+
+
+    <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Weather, Search -->
+        <FrameLayout
+            android:id="@+id/news_header_fLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_behavior="@string/behavior_uc_header_pager">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="330dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/uc_weather_block" />
+
+        </FrameLayout>
+
+        <!-- titlebar -->
+        <FrameLayout
+            android:id="@+id/titlebar_fLayout"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/uc_news_header_title_height"
+            android:layout_marginTop="@dimen/uc_news_header_title_init_offset"
+            android:background="@color/colorPrimary"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            app:layout_behavior="@string/behavior_uc_title">
+
+            <ImageView
+                android:layout_width="@dimen/titlebar_icon_size"
+                android:layout_height="@dimen/titlebar_icon_size"
+                android:layout_gravity="left|center_vertical"
+                android:src="@drawable/icon_book" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="@dimen/titlebar_icon_size"
+                android:text="@string/uc_news"
+                android:textColor="@android:color/white"
+                android:textSize="18sp" />
+
+            <ImageView
+                android:layout_width="@dimen/titlebar_icon_size"
+                android:layout_height="@dimen/titlebar_icon_size"
+                android:layout_gravity="right|center_vertical"
+                android:src="@drawable/icon_search" />
+
+        </FrameLayout>
+
+        <!-- uc_news -->
+        <android.support.design.widget.TabLayout
+            android:id="@+id/news_tabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/uc_news_tabs_height"
+            android:background="@color/news_tablayout_bg"
+            app:layout_behavior="@string/behavior_uc_news_tab"
+            app:tabGravity="fill"
+            app:tabIndicatorColor="@color/colorPrimary"
+            app:tabSelectedTextColor="@color/colorPrimary"
+            app:tabTextColor="@color/textGray" />
+
+        <com.kido.ucmaindemo.widget.CustomViewPager
+            android:id="@+id/news_viewPager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/colorBackground"
+            app:layout_behavior="@string/behavior_contents" />
+
+
+    </android.support.design.widget.CoordinatorLayout>
+
+</com.kido.ucmaindemo.widget.refresh.KSwipeRefreshLayout>
