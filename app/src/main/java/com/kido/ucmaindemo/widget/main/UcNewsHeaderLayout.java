@@ -65,21 +65,7 @@ public class UcNewsHeaderLayout extends FrameLayout {
                 CoordinatorLayout.LayoutParams coParams = (CoordinatorLayout.LayoutParams) getLayoutParams();
                 if (coParams.getBehavior() instanceof UcNewsHeaderLayout.Behavior) {
                     mBehavior = (UcNewsHeaderLayout.Behavior) coParams.getBehavior();
-                    mBehavior.setPagerStateListener(new Behavior.OnPagerStateListener() {
-                        @Override
-                        public void onPagerClosed() {
-                            if (mHeaderStateListener != null) {
-                                mHeaderStateListener.onHeaderClosed();
-                            }
-                        }
-
-                        @Override
-                        public void onPagerOpened() {
-                            if (mHeaderStateListener != null) {
-                                mHeaderStateListener.onHeaderOpened();
-                            }
-                        }
-                    });
+                    mBehavior.setPagerStateListener(mHeaderStateListener);
                 }
             }
         }
@@ -87,7 +73,9 @@ public class UcNewsHeaderLayout extends FrameLayout {
 
     public void setHeaderStateListener(OnHeaderStateListener listener) {
         mHeaderStateListener = listener;
-        ensureBehavior();
+        if (mBehavior != null) {
+            mBehavior.setPagerStateListener(mHeaderStateListener);
+        }
     }
 
     public void openHeader() {
@@ -108,16 +96,7 @@ public class UcNewsHeaderLayout extends FrameLayout {
     /**
      * callback for HeaderPager 's state
      */
-    public interface OnHeaderStateListener {
-        /**
-         * do callback when header closed
-         */
-        void onHeaderClosed();
-
-        /**
-         * do callback when header opened
-         */
-        void onHeaderOpened();
+    public interface OnHeaderStateListener extends Behavior.OnPagerStateListener {
     }
 
     public static class Behavior extends ViewOffsetBehavior {
@@ -194,11 +173,11 @@ public class UcNewsHeaderLayout extends FrameLayout {
                 mCurState = newState;
                 if (mCurState == STATE_OPENED) {
                     if (mPagerStateListener != null) {
-                        mPagerStateListener.onPagerOpened();
+                        mPagerStateListener.onHeaderOpened();
                     }
                 } else {
                     if (mPagerStateListener != null) {
-                        mPagerStateListener.onPagerClosed();
+                        mPagerStateListener.onHeaderClosed();
                     }
                 }
             }
@@ -332,12 +311,18 @@ public class UcNewsHeaderLayout extends FrameLayout {
                 }
                 mOverScroller.startScroll(0, Math.round(curTranslationY - 0.1f), 0, Math.round(dy + 0.1f), duration);
                 start();
+                if (mPagerStateListener != null) {
+                    mPagerStateListener.onHeaderStartClosing();
+                }
             }
 
             public void scrollToOpen(int duration) {
                 float curTranslationY = ViewCompat.getTranslationY(mLayout);
                 mOverScroller.startScroll(0, (int) curTranslationY, 0, (int) -curTranslationY, duration);
                 start();
+                if (mPagerStateListener != null) {
+                    mPagerStateListener.onHeaderStartOpening();
+                }
             }
 
             private void start() {
@@ -370,15 +355,20 @@ public class UcNewsHeaderLayout extends FrameLayout {
          * callback for HeaderPager 's state
          */
         public interface OnPagerStateListener {
+
+            void onHeaderStartClosing();
+
+            void onHeaderStartOpening();
+
             /**
              * do callback when pager closed
              */
-            void onPagerClosed();
+            void onHeaderClosed();
 
             /**
              * do callback when pager opened
              */
-            void onPagerOpened();
+            void onHeaderOpened();
         }
 
     }

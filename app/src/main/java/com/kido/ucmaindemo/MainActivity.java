@@ -1,7 +1,6 @@
 package com.kido.ucmaindemo;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -62,19 +61,29 @@ public class MainActivity extends AppCompatActivity {
         });
         mHeaderLayout.setHeaderStateListener(new UcNewsHeaderLayout.OnHeaderStateListener() {
             @Override
-            public void onHeaderClosed() {
+            public void onHeaderStartClosing() {
                 mContentPager.setPagingEnabled(true);
                 mFragments.get(0).setRefreshEnable(true);
                 mRefreshLayout.setEnabled(false);
             }
 
             @Override
-            public void onHeaderOpened() {
+            public void onHeaderStartOpening() {
                 mContentPager.setCurrentItem(0, false);
                 mContentPager.setPagingEnabled(false);
                 mFragments.get(0).scrollToTop();
                 mFragments.get(0).setRefreshEnable(false);
                 mRefreshLayout.setEnabled(true);
+            }
+
+            @Override
+            public void onHeaderClosed() {
+
+            }
+
+            @Override
+            public void onHeaderOpened() {
+
             }
         });
     }
@@ -125,15 +134,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initRefreshLayout() {
+        mRefreshLayout.setTerminalRate(1.5f);
         mRefreshLayout.setOnRefreshListener(new KSwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        mRefreshLayout.setRefreshing(false);
-                    }
-                }, 1500);
+                mRefreshLayout.setRefreshing(false);
             }
 
             @Override

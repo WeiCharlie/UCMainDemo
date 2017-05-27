@@ -212,7 +212,7 @@ public class KSwipeRefreshLayout extends ViewGroup implements NestedScrollingPar
     private static final int STATE_NORMAL = 1;
     private static final int STATE_TERMINAL = 2;
 
-    private static final float TERMINAL_RATE = 2.5f; // refresh point is 1.0, end point is 2.0
+    private static float TERMINAL_RATE = 2.5f; // refresh point is 1.0, end point is 2.0
 
 
     private int mIndicatorNormalBackground = DEFAULT_INDICATOR_NORMAL_BACKGROUND;
@@ -224,6 +224,18 @@ public class KSwipeRefreshLayout extends ViewGroup implements NestedScrollingPar
 
     private boolean mTerminalEnable = false;
     private Drawable mTerminalIconDrawable;
+
+
+    /**
+     * must bigger than 1.0f, better between 1.5~2.5f.
+     *
+     * @param rate
+     */
+    public void setTerminalRate(float rate) {
+        if(rate > 1f) {
+            TERMINAL_RATE = rate;
+        }
+    }
 
 
     void reset() {
