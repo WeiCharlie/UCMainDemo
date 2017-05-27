@@ -9,11 +9,12 @@
         android:id="@+id/refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:ksrl_terminal_enable="true"
         app:ksrl_indicator_normal_background="@color/colorPrimary"
         app:ksrl_indicator_normal_foreground="@color/colorPrimaryIcons"
         app:ksrl_indicator_terminal_background="@color/colorAccent"
-        app:ksrl_indicator_terminal_foreground="@color/colorPrimaryIcons">
+        app:ksrl_indicator_terminal_foreground="@color/colorPrimaryIcons"
+        app:ksrl_terminal_enable="true"
+        app:ksrl_terminal_icon="@drawable/icon_indicator_home">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recyclerView"

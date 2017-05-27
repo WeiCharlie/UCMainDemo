@@ -18,6 +18,7 @@ package com.kido.ucmaindemo.widget.refresh;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.Nullable;
@@ -215,6 +216,8 @@ public class KSwipeRefreshLayout extends ViewGroup implements NestedScrollingPar
     private int mIndicatorTerminalForeground = DEFAULT_INDICATOR_TERMINAL_FOREGROUND;
 
     private boolean mTerminalEnable = false;
+    private int mTerminalIconResId = -1;
+    private Drawable mTerminalIconDrawable;
 
     void reset() {
         mCircleView.clearAnimation();
@@ -378,33 +381,37 @@ public class KSwipeRefreshLayout extends ViewGroup implements NestedScrollingPar
 
         final TypedArray a1 = context.obtainStyledAttributes(attrs, LAYOUT_ATTRS);
         setEnabled(a1.getBoolean(0, true));
+        a1.recycle();
 
         TypedArray a2 = context.obtainStyledAttributes(attrs, R.styleable.KSwipeRefreshLayout);
-
         mIndicatorNormalBackground = a2.getColor(R.styleable.KSwipeRefreshLayout_ksrl_indicator_normal_background, DEFAULT_INDICATOR_NORMAL_BACKGROUND);
         mIndicatorNormalForeground = a2.getColor(R.styleable.KSwipeRefreshLayout_ksrl_indicator_normal_foreground, DEFAULT_INDICATOR_NORMAL_FOREGROUND);
         mIndicatorTerminalBackground = a2.getColor(R.styleable.KSwipeRefreshLayout_ksrl_indicator_terminal_background, DEFAULT_INDICATOR_TERMINAL_BACKGROUND);
         mIndicatorTerminalForeground = a2.getColor(R.styleable.KSwipeRefreshLayout_ksrl_indicator_terminal_foreground, DEFAULT_INDICATOR_TERMINAL_FOREGROUND);
         mTerminalEnable = a2.getBoolean(R.styleable.KSwipeRefreshLayout_ksrl_terminal_enable, false);
-
-        a1.recycle();
+        mTerminalIconResId = a2.getResourceId(R.styleable.KSwipeRefreshLayout_ksrl_terminal_icon, -1);
+        if (mTerminalIconResId != -1) {
+            mTerminalIconDrawable = getResources().getDrawable(mTerminalIconResId);
+        }
         a2.recycle();
 
         init();
     }
 
     private void init() {
-        normalColors();
+        normalState();
     }
 
-    private void normalColors() {
+    private void normalState() {
         setColorSchemeColors(mIndicatorNormalForeground);
         setProgressBackgroundColorSchemeColor(mIndicatorNormalBackground);
+        mCircleView.setImageDrawable(mProgress);
     }
 
-    private void terminalColors() {
+    private void terminalState() {
         setColorSchemeColors(mIndicatorTerminalForeground);
         setProgressBackgroundColorSchemeColor(mIndicatorTerminalBackground);
+        mCircleView.setImageDrawable(mTerminalIconDrawable);
     }
 
     @Override
@@ -1009,9 +1016,9 @@ public class KSwipeRefreshLayout extends ViewGroup implements NestedScrollingPar
 
         if (mTerminalEnable) {
             if (overscrollTop >= mTotalDragDistance * TERMINAL_RATE) {
-                terminalColors();
+                terminalState();
             } else {
-                normalColors();
+                normalState();
             }
         }
 

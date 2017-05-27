@@ -7,6 +7,7 @@
         <attr name="ksrl_indicator_terminal_background" format="color" />
         <attr name="ksrl_indicator_terminal_foreground" format="color" />
         <attr name="ksrl_terminal_enable" format="boolean" />
+        <attr name="ksrl_terminal_icon" format="reference" />
     </declare-styleable>
 
 </resources>
