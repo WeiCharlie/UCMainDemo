@@ -212,7 +212,8 @@ public class KSwipeRefreshLayout extends ViewGroup implements NestedScrollingPar
     private static final int STATE_NORMAL = 1;
     private static final int STATE_TERMINAL = 2;
 
-    private static float TERMINAL_RATE = 2.5f; // refresh point is 1.0, end point is 2.0
+    private float DEFAULT_TERMINAL_RATE = 2.5f;// refresh point is 1.0, end point is 2.0
+    private float mTerminalRate = DEFAULT_TERMINAL_RATE;
 
 
     private int mIndicatorNormalBackground = DEFAULT_INDICATOR_NORMAL_BACKGROUND;
@@ -233,7 +234,7 @@ public class KSwipeRefreshLayout extends ViewGroup implements NestedScrollingPar
      */
     public void setTerminalRate(float rate) {
         if(rate > 1f) {
-            TERMINAL_RATE = rate;
+            mTerminalRate = rate;
         }
     }
 
@@ -1040,7 +1041,7 @@ public class KSwipeRefreshLayout extends ViewGroup implements NestedScrollingPar
         }
 
         if (mTerminalEnable) {
-            if (overscrollTop >= mTotalDragDistance * TERMINAL_RATE) {
+            if (overscrollTop >= mTotalDragDistance * mTerminalRate) {
                 switchState(STATE_TERMINAL);
             } else {
                 switchState(STATE_NORMAL);
@@ -1075,13 +1076,13 @@ public class KSwipeRefreshLayout extends ViewGroup implements NestedScrollingPar
         if (BuildConfig.DEBUG) {
             Log.e(LOG_TAG, "finishSpinner->overscrollTop=" + overscrollTop + ", mTotalDragDistance=" + mTotalDragDistance);
         }
-        if (overscrollTop > mTotalDragDistance && (!mTerminalEnable || overscrollTop < mTotalDragDistance * TERMINAL_RATE)) {
+        if (overscrollTop > mTotalDragDistance && (!mTerminalEnable || overscrollTop < mTotalDragDistance * mTerminalRate)) {
             setRefreshing(true, true /* notify */);
         } else {
 
             // over too much, trigger onTerminal
             if (mTerminalEnable) {
-                if (overscrollTop >= mTotalDragDistance * TERMINAL_RATE) {
+                if (overscrollTop >= mTotalDragDistance * mTerminalRate) {
                     if (mListener != null) {
                         mListener.onTerminal();
                         if (BuildConfig.DEBUG) {

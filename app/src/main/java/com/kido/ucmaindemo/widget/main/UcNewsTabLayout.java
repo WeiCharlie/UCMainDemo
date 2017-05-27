@@ -38,7 +38,7 @@ public class UcNewsTabLayout extends TabLayout {
         init(context);
     }
 
-    private void init(Context context) {
+    private void init(Context context) {// TODO: 2017/5/27 取值待优化
         sHeaderOffsetRange = context.getResources().getDimensionPixelOffset(R.dimen.uc_news_header_pager_offset);
         sFinalTopHeight = context.getResources().getDimensionPixelOffset(R.dimen.uc_news_header_title_height);
     }

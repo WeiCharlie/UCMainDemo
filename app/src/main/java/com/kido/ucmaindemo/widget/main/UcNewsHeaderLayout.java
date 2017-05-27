@@ -54,7 +54,7 @@ public class UcNewsHeaderLayout extends FrameLayout {
         ensureBehavior();
     }
 
-    private void init(Context context) {
+    private void init(Context context) {// TODO: 2017/5/27 取值待优化
         mContext = context;
         sHeaderOffsetRange = context.getResources().getDimensionPixelOffset(R.dimen.uc_news_header_pager_offset);
     }

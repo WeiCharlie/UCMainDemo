@@ -38,7 +38,7 @@ public class UcNewsTitleLayout extends FrameLayout {
         init(context);
     }
 
-    private void init(Context context) {
+    private void init(Context context) {// TODO: 2017/5/27 取值待优化
         sHeaderOffsetRange = context.getResources().getDimensionPixelOffset(R.dimen.uc_news_header_pager_offset);
         sTitleHeight = context.getResources().getDimensionPixelOffset(R.dimen.uc_news_header_title_height);
     }
