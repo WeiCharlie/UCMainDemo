@@ -8,6 +8,8 @@ import com.kido.ucmaindemo.NewsTagFragment;
 import java.util.List;
 
 /**
+ * 新闻标签fragment适配器
+ *
  * @author Kido
  */
 

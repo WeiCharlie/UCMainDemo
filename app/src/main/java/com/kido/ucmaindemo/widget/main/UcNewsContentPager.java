@@ -15,7 +15,7 @@ import com.kido.ucmaindemo.widget.main.helper.HeaderScrollingViewBehavior;
 import java.util.List;
 
 /**
- * 多个新闻列表的容器ViewPager
+ * 多个新闻列表的容器
  *
  * @author Kido
  */

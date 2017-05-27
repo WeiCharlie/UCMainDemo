@@ -14,7 +14,6 @@ import android.widget.FrameLayout;
 import android.widget.OverScroller;
 
 import com.kido.ucmaindemo.BuildConfig;
-import com.kido.ucmaindemo.MyApplication;
 import com.kido.ucmaindemo.R;
 import com.kido.ucmaindemo.widget.main.helper.ViewOffsetBehavior;
 
@@ -131,7 +130,7 @@ public class UcNewsHeaderLayout extends FrameLayout {
         private int mCurState = STATE_OPENED;
         private OnPagerStateListener mPagerStateListener;
 
-        private OverScroller mOverScroller = new OverScroller(MyApplication.getContext());
+        private OverScroller mOverScroller;
 
         private WeakReference<CoordinatorLayout> mParent;
         private WeakReference<View> mChild;
@@ -144,9 +143,14 @@ public class UcNewsHeaderLayout extends FrameLayout {
         public Behavior() {
         }
 
-
         public Behavior(Context context, AttributeSet attrs) {
             super(context, attrs);
+        }
+
+        private void ensureScroller(Context context) {
+            if (mOverScroller == null) {
+                mOverScroller = new OverScroller(context);
+            }
         }
 
         @Override
@@ -154,6 +158,7 @@ public class UcNewsHeaderLayout extends FrameLayout {
             super.layoutChild(parent, child, layoutDirection);
             mParent = new WeakReference<CoordinatorLayout>(parent);
             mChild = new WeakReference<View>(child);
+            ensureScroller(child.getContext());
         }
 
         @Override
@@ -161,6 +166,7 @@ public class UcNewsHeaderLayout extends FrameLayout {
             if (BuildConfig.DEBUG) {
                 Log.d(TAG, "onStartNestedScroll: ");
             }
+            ensureScroller(child.getContext());
             return (nestedScrollAxes & ViewCompat.SCROLL_AXIS_VERTICAL) != 0 && canScroll(child, 0) && !isClosed(child);
         }
 
@@ -168,6 +174,7 @@ public class UcNewsHeaderLayout extends FrameLayout {
         @Override
         public boolean onNestedPreFling(CoordinatorLayout coordinatorLayout, View child, View target, float velocityX, float velocityY) {
             // consumed the flinging behavior until Closed
+            ensureScroller(child.getContext());
             return !isClosed(child);
         }
 
@@ -186,9 +193,13 @@ public class UcNewsHeaderLayout extends FrameLayout {
             if (mCurState != newState) {
                 mCurState = newState;
                 if (mCurState == STATE_OPENED) {
-                    mPagerStateListener.onPagerOpened();
+                    if (mPagerStateListener != null) {
+                        mPagerStateListener.onPagerOpened();
+                    }
                 } else {
-                    mPagerStateListener.onPagerClosed();
+                    if (mPagerStateListener != null) {
+                        mPagerStateListener.onPagerClosed();
+                    }
                 }
             }
 
@@ -204,6 +215,7 @@ public class UcNewsHeaderLayout extends FrameLayout {
 
         @Override
         public boolean onInterceptTouchEvent(CoordinatorLayout parent, final View child, MotionEvent ev) {
+            ensureScroller(child.getContext());
             if (ev.getAction() == MotionEvent.ACTION_UP && !isClosed()) {
                 handleActionUp(parent, child);
             }
@@ -213,6 +225,7 @@ public class UcNewsHeaderLayout extends FrameLayout {
         @Override
         public void onNestedPreScroll(CoordinatorLayout coordinatorLayout, View child, View target, int dx, int dy, int[] consumed) {
             super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed);
+            ensureScroller(child.getContext());
             //dy>0 scroll up;dy<0,scroll down
             float halfOfDis = dy / 4.0f; // 为了不那么敏感
             if (!canScroll(child, halfOfDis)) {
