@@ -2,14 +2,15 @@ package com.kido.ucmaindemo;
 
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.kido.ucmaindemo.adapter.TagFragmentAdapter;
-import com.kido.ucmaindemo.behavior.UcNewsHeaderPagerBehavior;
-import com.kido.ucmaindemo.widget.CustomViewPager;
+import com.kido.ucmaindemo.widget.main.UcNewsContentPager;
+import com.kido.ucmaindemo.widget.main.UcNewsHeaderLayout;
+import com.kido.ucmaindemo.widget.main.UcNewsTabLayout;
+import com.kido.ucmaindemo.widget.main.UcNewsTitleLayout;
 import com.kido.ucmaindemo.widget.refresh.KSwipeRefreshLayout;
 
 import java.util.ArrayList;
@@ -24,12 +25,12 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private KSwipeRefreshLayout mRefreshLayout;
-    private View titlebarFLayout;
-    private CustomViewPager mViewPager;
-    private TabLayout mTabLayout;
+    private UcNewsTitleLayout titleLayout;
+    private UcNewsHeaderLayout mHeaderLayout;
+    private UcNewsContentPager mContentPager;
+    private UcNewsTabLayout mTabLayout;
 
     private List<NewsTagFragment> mFragments;
-    private UcNewsHeaderPagerBehavior mPagerBehavior;
 
 
     @Override
@@ -37,29 +38,47 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         bindViews();
-        initTitleLayout();
+        initTitleAndHeader();
         initTabsPager();
         initRefreshLayout();
-        initBehavior();
     }
 
     private void bindViews() {
 
         mRefreshLayout = (KSwipeRefreshLayout) findViewById(R.id.root_refresh_layout);
-        titlebarFLayout = findViewById(R.id.titlebar_fLayout);
-        mViewPager = (CustomViewPager) findViewById(R.id.news_viewPager);
-        mTabLayout = (TabLayout) findViewById(R.id.news_tabLayout);
+        titleLayout = (UcNewsTitleLayout) findViewById(R.id.titlebar_layout);
+        mHeaderLayout = (UcNewsHeaderLayout) findViewById(R.id.news_header_layout);
+        mContentPager = (UcNewsContentPager) findViewById(R.id.news_viewPager);
+        mTabLayout = (UcNewsTabLayout) findViewById(R.id.news_tabLayout);
 
     }
 
-    private void initTitleLayout() {
-        titlebarFLayout.setOnClickListener(new View.OnClickListener() {
+    private void initTitleAndHeader() {
+        titleLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mFragments.get(mViewPager.getCurrentItem()).getRecyclerView().smoothScrollToPosition(0);
+                mFragments.get(mContentPager.getCurrentItem()).getRecyclerView().smoothScrollToPosition(0);
+            }
+        });
+        mHeaderLayout.setHeaderStateListener(new UcNewsHeaderLayout.OnHeaderStateListener() {
+            @Override
+            public void onHeaderClosed() {
+                mContentPager.setPagingEnabled(true);
+                mFragments.get(0).setRefreshEnable(true);
+                mRefreshLayout.setEnabled(false);
+            }
+
+            @Override
+            public void onHeaderOpened() {
+                mContentPager.setCurrentItem(0, false);
+                mContentPager.setPagingEnabled(false);
+                mFragments.get(0).scrollToTop();
+                mFragments.get(0).setRefreshEnable(false);
+                mRefreshLayout.setEnabled(true);
             }
         });
     }
+
 
     private void initTabsPager() {
         String[] newsTabTitles = getResources().getStringArray(R.array.news_tab_titles);
@@ -74,25 +93,23 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onTerminal() {
-                    if (mPagerBehavior != null && mPagerBehavior.isClosed()) {
-                        mPagerBehavior.openPager();
-                    }
+                public void onTerminal() { // open header to go back home
+                    mHeaderLayout.openHeader();
                 }
             });
             mFragments.add(fragment);
         }
 
-        mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
-        mViewPager.setAdapter(new TagFragmentAdapter(getSupportFragmentManager(), mFragments));
-        mViewPager.setPagingEnabled(false);
+        mContentPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
+        mContentPager.setAdapter(new TagFragmentAdapter(getSupportFragmentManager(), mFragments));
+        mContentPager.setPagingEnabled(false);
 
         mTabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
         mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
 
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                mViewPager.setCurrentItem(tab.getPosition());
+                mContentPager.setCurrentItem(tab.getPosition());
             }
 
             @Override
@@ -120,43 +137,16 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onTerminal() {
-                if (mPagerBehavior != null && !mPagerBehavior.isClosed()) {
-                    mPagerBehavior.closePager();
-                }
+            public void onTerminal() { // close header to go to news list
+                mHeaderLayout.closeHeader();
             }
         });
     }
 
-    private void initBehavior() {
-        mPagerBehavior = (UcNewsHeaderPagerBehavior) ((CoordinatorLayout.LayoutParams) findViewById(R.id.news_header_fLayout).getLayoutParams()).getBehavior();
-        if (mPagerBehavior != null) {
-            mPagerBehavior.setPagerStateListener(new UcNewsHeaderPagerBehavior.OnPagerStateListener() {
-
-                @Override
-                public void onPagerClosed() {
-                    mViewPager.setPagingEnabled(true);
-                    mFragments.get(0).setRefreshEnable(true);
-                    mRefreshLayout.setEnabled(false);
-                }
-
-                @Override
-                public void onPagerOpened() {
-                    mViewPager.setCurrentItem(0, false);
-                    mViewPager.setPagingEnabled(false);
-                    mFragments.get(0).scrollToTop();
-                    mFragments.get(0).setRefreshEnable(false);
-                    mRefreshLayout.setEnabled(true);
-
-                }
-            });
-        }
-    }
-
     @Override
     public void onBackPressed() {
-        if (mPagerBehavior != null && mPagerBehavior.isClosed()) {
-            mPagerBehavior.openPager();
+        if (mHeaderLayout.isClosed()) {
+            mHeaderLayout.openHeader();
         } else {
             super.onBackPressed();
         }
