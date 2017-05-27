@@ -6,5 +6,3 @@
  
 ### 以下是效果图
 ![效果图](ucmaindemo.gif)
-
-高清效果可见目录底下的视频文件ucmaindemo.mp4
