@@ -7,7 +7,7 @@ import android.view.View;
 
 import com.kido.ucmaindemo.adapter.TagFragmentAdapter;
 import com.kido.ucmaindemo.widget.main.UcNewsContentPager;
-import com.kido.ucmaindemo.widget.main.UcNewsHeaderLayout;
+import com.kido.ucmaindemo.widget.main.UcNewsBarLayout;
 import com.kido.ucmaindemo.widget.main.UcNewsTabLayout;
 import com.kido.ucmaindemo.widget.main.UcNewsTitleLayout;
 import com.kido.ucmaindemo.widget.refresh.KSwipeRefreshLayout;
@@ -24,10 +24,10 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private KSwipeRefreshLayout mRefreshLayout;
-    private UcNewsTitleLayout titleLayout;
-    private UcNewsHeaderLayout mHeaderLayout;
-    private UcNewsContentPager mContentPager;
+    private UcNewsTitleLayout mTitleLayout;
+    private UcNewsBarLayout mBarLayout;
     private UcNewsTabLayout mTabLayout;
+    private UcNewsContentPager mContentPager;
 
     private List<NewsTagFragment> mFragments;
 
@@ -45,30 +45,30 @@ public class MainActivity extends AppCompatActivity {
     private void bindViews() {
 
         mRefreshLayout = (KSwipeRefreshLayout) findViewById(R.id.root_refresh_layout);
-        titleLayout = (UcNewsTitleLayout) findViewById(R.id.titlebar_layout);
-        mHeaderLayout = (UcNewsHeaderLayout) findViewById(R.id.news_header_layout);
+        mTitleLayout = (UcNewsTitleLayout) findViewById(R.id.titlebar_layout);
+        mBarLayout = (UcNewsBarLayout) findViewById(R.id.news_header_layout);
         mContentPager = (UcNewsContentPager) findViewById(R.id.news_viewPager);
         mTabLayout = (UcNewsTabLayout) findViewById(R.id.news_tabLayout);
 
     }
 
     private void initTitleAndHeader() {
-        titleLayout.setOnClickListener(new View.OnClickListener() {
+        mTitleLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mFragments.get(mContentPager.getCurrentItem()).getRecyclerView().smoothScrollToPosition(0);
             }
         });
-        mHeaderLayout.setHeaderStateListener(new UcNewsHeaderLayout.OnHeaderStateListener() {
+        mBarLayout.setHeaderStateListener(new UcNewsBarLayout.OnHeaderStateListener() {
             @Override
-            public void onHeaderStartClosing() {
+            public void onBarStartClosing() {
                 mContentPager.setPagingEnabled(true);
                 mFragments.get(0).setRefreshEnable(true);
                 mRefreshLayout.setEnabled(false);
             }
 
             @Override
-            public void onHeaderStartOpening() {
+            public void onBarStartOpening() {
                 mContentPager.setCurrentItem(0, false);
                 mContentPager.setPagingEnabled(false);
                 mFragments.get(0).scrollToTop();
@@ -77,12 +77,12 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onHeaderClosed() {
+            public void onBarClosed() {
 
             }
 
             @Override
-            public void onHeaderOpened() {
+            public void onBarOpened() {
 
             }
         });
@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onTerminal() { // open header to go back home
-                    mHeaderLayout.openHeader();
+                    mBarLayout.openBar();
                 }
             });
             mFragments.add(fragment);
@@ -143,15 +143,15 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onTerminal() { // close header to go to news list
-                mHeaderLayout.closeHeader();
+                mBarLayout.closeBar();
             }
         });
     }
 
     @Override
     public void onBackPressed() {
-        if (mHeaderLayout.isClosed()) {
-            mHeaderLayout.openHeader();
+        if (mBarLayout.isClosed()) {
+            mBarLayout.openBar();
         } else {
             super.onBackPressed();
         }

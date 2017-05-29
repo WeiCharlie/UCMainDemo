@@ -10,4 +10,10 @@
         <attr name="ksrl_terminal_icon" format="reference" />
     </declare-styleable>
 
+    <declare-styleable name="UcNewsBarLayout">
+        <attr name="unbl_offset_range" format="reference" />
+        <attr name="unbl_closing_header" format="reference" />
+        <attr name="unbl_closing_footer" format="reference" />
+    </declare-styleable>
+
 </resources>
