@@ -33,7 +33,7 @@
 
         </com.kido.ucmaindemo.widget.main.UcNewsBarLayout>
 
-        <!-- TitleBar -->
+        <!-- title layout (as the header of BarLayout)  -->
         <com.kido.ucmaindemo.widget.main.UcNewsTitleLayout
             android:id="@+id/titlebar_layout"
             android:layout_width="match_parent"
@@ -65,7 +65,7 @@
 
         </com.kido.ucmaindemo.widget.main.UcNewsTitleLayout>
 
-        <!-- UC News (tabs & pager) -->
+        <!-- tabs (as the footer of BarLayout) -->
         <com.kido.ucmaindemo.widget.main.UcNewsTabLayout
             android:id="@+id/news_tabLayout"
             android:layout_width="match_parent"
@@ -76,6 +76,7 @@
             app:tabSelectedTextColor="@color/colorPrimary"
             app:tabTextColor="@color/textGray" />
 
+        <!-- content pager (as the follower of BarLayout) -->
         <com.kido.ucmaindemo.widget.main.UcNewsContentPager
             android:id="@+id/news_viewPager"
             android:layout_width="match_parent"

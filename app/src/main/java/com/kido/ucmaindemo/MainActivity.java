@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
                 mFragments.get(mContentPager.getCurrentItem()).getRecyclerView().smoothScrollToPosition(0);
             }
         });
-        mBarLayout.setHeaderStateListener(new UcNewsBarLayout.OnHeaderStateListener() {
+        mBarLayout.setBarStateListener(new UcNewsBarLayout.OnBarStateListener() {
             @Override
             public void onBarStartClosing() {
                 mContentPager.setPagingEnabled(true);

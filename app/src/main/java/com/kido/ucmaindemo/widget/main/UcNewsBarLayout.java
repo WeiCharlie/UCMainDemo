@@ -23,6 +23,7 @@ import com.kido.ucmaindemo.widget.main.helper.ViewOffsetBehavior;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
+
 /**
  * 新闻列表的顶部Layout
  * </p>
@@ -35,7 +36,7 @@ import java.util.List;
 public class UcNewsBarLayout extends FrameLayout {
 
     private UcNewsBarLayout.Behavior mBehavior;
-    private OnHeaderStateListener mHeaderStateListener;
+    private OnBarStateListener mBarStateListener;
     private Context mContext;
 
 
@@ -61,10 +62,10 @@ public class UcNewsBarLayout extends FrameLayout {
 
     public UcNewsBarLayout(@NonNull Context context, @Nullable AttributeSet attrs, @AttrRes int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.UcNewsBarLayout);
+
         mOffsetRange = a.getDimensionPixelSize(R.styleable.UcNewsBarLayout_unbl_offset_range, INVALID_SCROLL_RANGE);
-
-
         mHeaderId = a.getResourceId(R.styleable.UcNewsBarLayout_unbl_closing_header, INVALID_RESOURCE_ID);
         mFooterId = a.getResourceId(R.styleable.UcNewsBarLayout_unbl_closing_footer, INVALID_RESOURCE_ID);
 
@@ -107,7 +108,7 @@ public class UcNewsBarLayout extends FrameLayout {
                 CoordinatorLayout.LayoutParams coParams = (CoordinatorLayout.LayoutParams) getLayoutParams();
                 if (coParams.getBehavior() instanceof UcNewsBarLayout.Behavior) {
                     mBehavior = (UcNewsBarLayout.Behavior) coParams.getBehavior();
-                    mBehavior.setPagerStateListener(mHeaderStateListener);
+                    mBehavior.setPagerStateListener(mBarStateListener);
                 }
             }
         }
@@ -117,6 +118,34 @@ public class UcNewsBarLayout extends FrameLayout {
         mContext = context;
     }
 
+    /**
+     * 本layout的header的高度
+     *
+     * @return
+     */
+    public int getHeaderHeight() {
+        int height = 0;
+        if (mHeaderView != null) {
+            CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) mHeaderView.getLayoutParams();
+            height = mHeaderView.getMeasuredHeight() /*+ layoutParams.topMargin + layoutParams.bottomMargin*/; // FIXME: 17/5/29 HeaderBehavior中的实现是改变topMargin
+        }
+        return height;
+    }
+
+    /**
+     * 本layout的footer的高度
+     *
+     * @return
+     */
+
+    public int getFooterHeight() {
+        int height = 0;
+        if (mFooterView != null) {
+            CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) mFooterView.getLayoutParams();
+            height = mFooterView.getMeasuredHeight() + layoutParams.topMargin + layoutParams.bottomMargin;
+        }
+        return height;
+    }
 
     /**
      * 本layout能向上滑动的最大偏移
@@ -127,36 +156,15 @@ public class UcNewsBarLayout extends FrameLayout {
         if (mOffsetRange != INVALID_SCROLL_RANGE) {
             return mOffsetRange;
         }
-        int headerHeight = mHeaderView != null ? mHeaderView.getMeasuredHeight() : 0;
-        int footerHeight = mFooterView != null ? mFooterView.getMeasuredHeight() : 0;
-        mOffsetRange = -(headerHeight + footerHeight);
+        mOffsetRange = -(getHeaderHeight() + getFooterHeight()); // 默认offset为header的高度+footer的高度
         return mOffsetRange;
     }
 
-    /**
-     * 本layout的header的高度
-     *
-     * @return
-     */
-    public int getHeaderHeight() {
-        return mHeaderView != null ? mHeaderView.getMeasuredHeight() : 0;
-    }
 
-    /**
-     * 本layout的footer的高度
-     *
-     * @return
-     */
-
-    public int getFooterHeight() {
-        return mFooterView != null ? mFooterView.getMeasuredHeight() : 0;
-    }
-
-
-    public void setHeaderStateListener(OnHeaderStateListener listener) {
-        mHeaderStateListener = listener;
+    public void setBarStateListener(OnBarStateListener listener) {
+        mBarStateListener = listener;
         if (mBehavior != null) {
-            mBehavior.setPagerStateListener(mHeaderStateListener);
+            mBehavior.setPagerStateListener(mBarStateListener);
         }
     }
 
@@ -183,7 +191,7 @@ public class UcNewsBarLayout extends FrameLayout {
     /**
      * callback for HeaderPager 's state
      */
-    public interface OnHeaderStateListener extends Behavior.OnPagerStateListener {
+    public interface OnBarStateListener extends Behavior.OnPagerStateListener {
     }
 
 
@@ -193,7 +201,7 @@ public class UcNewsBarLayout extends FrameLayout {
      */
 
     public static class Behavior extends ViewOffsetBehavior {
-        private static final String TAG = "UcNewsBarBehavior";
+        private static final String TAG = "UNBL_Behavior";
         public static final int STATE_OPENED = 0;
         public static final int STATE_CLOSED = 1;
         public static final int DURATION_SHORT = 300;
@@ -251,7 +259,7 @@ public class UcNewsBarLayout extends FrameLayout {
 
 
         private boolean isClosed(View child) {
-            boolean isClosed = child.getTranslationY() == getHeaderOffsetRange(child);
+            boolean isClosed = child.getTranslationY() == getBarOffsetRange(child);
             return isClosed;
         }
 
@@ -278,7 +286,7 @@ public class UcNewsBarLayout extends FrameLayout {
 
         private boolean canScroll(View child, float pendingDy) {
             int pendingTranslationY = (int) (child.getTranslationY() - pendingDy);
-            if (pendingTranslationY >= getHeaderOffsetRange(child) && pendingTranslationY <= 0) {
+            if (pendingTranslationY >= getBarOffsetRange(child) && pendingTranslationY <= 0) {
                 return true;
             }
             return false;
@@ -299,7 +307,7 @@ public class UcNewsBarLayout extends FrameLayout {
             //dy>0 scroll up;dy<0,scroll down
             float halfOfDis = dy / 4.0f; // 为了不那么敏感
             if (!canScroll(child, halfOfDis)) {
-                child.setTranslationY(halfOfDis > 0 ? getHeaderOffsetRange(child) : 0);
+                child.setTranslationY(halfOfDis > 0 ? getBarOffsetRange(child) : 0);
             } else {
                 child.setTranslationY(child.getTranslationY() - halfOfDis);
             }
@@ -308,7 +316,7 @@ public class UcNewsBarLayout extends FrameLayout {
         }
 
 
-        private int getHeaderOffsetRange(View child) {
+        private int getBarOffsetRange(View child) {
             if (child instanceof UcNewsBarLayout) {
                 return ((UcNewsBarLayout) child).getBarOffsetRange();
             }
@@ -325,7 +333,7 @@ public class UcNewsBarLayout extends FrameLayout {
                 mFlingRunnable = null;
             }
             mFlingRunnable = new FlingRunnable(parent, child);
-            if (child.getTranslationY() < getHeaderOffsetRange(child) / 3.0f) {
+            if (child.getTranslationY() < getBarOffsetRange(child) / 3.0f) {
                 mFlingRunnable.scrollToClosed(DURATION_SHORT);
             } else {
                 mFlingRunnable.scrollToOpen(DURATION_SHORT);
@@ -396,9 +404,9 @@ public class UcNewsBarLayout extends FrameLayout {
 
             public void scrollToClosed(int duration) {
                 float curTranslationY = ViewCompat.getTranslationY(mLayout);
-                float dy = getHeaderOffsetRange(mLayout) - curTranslationY;
+                float dy = getBarOffsetRange(mLayout) - curTranslationY;
                 if (BuildConfig.DEBUG) {
-                    Log.d(TAG, "scrollToClosed:offest:" + getHeaderOffsetRange(mLayout));
+                    Log.d(TAG, "scrollToClosed:offest:" + getBarOffsetRange(mLayout));
                     Log.d(TAG, "scrollToClosed: cur0:" + curTranslationY + ",end0:" + dy);
                     Log.d(TAG, "scrollToClosed: cur:" + Math.round(curTranslationY) + ",end:" + Math.round(dy));
                     Log.d(TAG, "scrollToClosed: cur1:" + (int) (curTranslationY) + ",end:" + (int) dy);
@@ -473,7 +481,7 @@ public class UcNewsBarLayout extends FrameLayout {
      */
 
     public static class BarHeaderBehavior extends CoordinatorLayout.Behavior<View> {
-        private static final String TAG = "UcNewsBarHeaderBehavior";
+        private static final String TAG = "UNBL_HeaderBehavior";
 
         public BarHeaderBehavior() {
         }
@@ -506,7 +514,7 @@ public class UcNewsBarLayout extends FrameLayout {
         }
 
         private void offsetChildAsNeeded(CoordinatorLayout parent, View child, View dependency) {
-            int headerOffsetRange = getHeaderOffsetRange(dependency);
+            int headerOffsetRange = getBarOffsetRange(dependency);
             int titleOffsetRange = getTitleOffsetRange(dependency);
             if (BuildConfig.DEBUG) {
                 Log.d(TAG, "offsetChildAsNeeded:" + dependency.getTranslationY());
@@ -521,7 +529,7 @@ public class UcNewsBarLayout extends FrameLayout {
 
         }
 
-        private int getHeaderOffsetRange(View dependency) {
+        private int getBarOffsetRange(View dependency) {
             if (dependency instanceof UcNewsBarLayout) {
                 return ((UcNewsBarLayout) dependency).getBarOffsetRange();
             }
@@ -548,7 +556,7 @@ public class UcNewsBarLayout extends FrameLayout {
      */
 
     public static class BarFooterBehavior extends HeaderScrollingViewBehavior {
-        private static final String TAG = "UcNewsBarFooterBehavior";
+        private static final String TAG = "UNBL_FooterBehavior";
 
         public BarFooterBehavior() {
         }
@@ -583,13 +591,14 @@ public class UcNewsBarLayout extends FrameLayout {
 
         private void offsetChildAsNeeded(CoordinatorLayout parent, View child, View dependency) {
             float offsetRange = dependency.getTop() + getFinalTopHeight(dependency) - child.getTop();
-            int headerOffsetRange = getHeaderOffsetRange(dependency);
+            // float offsetRange = -(child.getTop() - dependency.getTop() - getFinalTopHeight(dependency));
+            int headerOffsetRange = getBarOffsetRange(dependency);
             if (dependency.getTranslationY() == headerOffsetRange) {
                 child.setTranslationY(offsetRange);
             } else if (dependency.getTranslationY() == 0) {
                 child.setTranslationY(0);
             } else {
-                child.setTranslationY((int) (dependency.getTranslationY() / (getHeaderOffsetRange(dependency) * 1.0f) * offsetRange));
+                child.setTranslationY((int) (dependency.getTranslationY() / (getBarOffsetRange(dependency) * 1.0f) * offsetRange));
             }
         }
 
@@ -604,7 +613,7 @@ public class UcNewsBarLayout extends FrameLayout {
             return null;
         }
 
-        private int getHeaderOffsetRange(View dependency) {
+        private int getBarOffsetRange(View dependency) {
             if (dependency instanceof UcNewsBarLayout) {
                 return ((UcNewsBarLayout) dependency).getBarOffsetRange();
             }
@@ -629,7 +638,7 @@ public class UcNewsBarLayout extends FrameLayout {
      * ********************* Behavior for Bar Follower **************************
      */
     public static class BarFollowerBehavior extends HeaderScrollingViewBehavior {
-        private static final String TAG = "UcNewsBarFollowerBehavior";
+        private static final String TAG = "UNBL_FollowerBehavior";
 
         public BarFollowerBehavior() {
         }
