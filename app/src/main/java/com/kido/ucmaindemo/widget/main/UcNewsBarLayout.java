@@ -47,8 +47,10 @@ public class UcNewsBarLayout extends FrameLayout {
 
     private int mHeaderId = INVALID_RESOURCE_ID;
     private int mFooterId = INVALID_RESOURCE_ID;
+    private int mFollowerId = INVALID_RESOURCE_ID;
     private View mHeaderView;
     private View mFooterView;
+    private View mFollowerView;
 
     public UcNewsBarLayout(@NonNull Context context) {
         super(context);
@@ -68,6 +70,7 @@ public class UcNewsBarLayout extends FrameLayout {
         mOffsetRange = a.getDimensionPixelSize(R.styleable.UcNewsBarLayout_unbl_offset_range, INVALID_SCROLL_RANGE);
         mHeaderId = a.getResourceId(R.styleable.UcNewsBarLayout_unbl_closing_header, INVALID_RESOURCE_ID);
         mFooterId = a.getResourceId(R.styleable.UcNewsBarLayout_unbl_closing_footer, INVALID_RESOURCE_ID);
+        mFollowerId = a.getResourceId(R.styleable.UcNewsBarLayout_unbl_closing_follower, INVALID_RESOURCE_ID);
 
         a.recycle();
 
@@ -77,29 +80,51 @@ public class UcNewsBarLayout extends FrameLayout {
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
-        findHeaderFooter();
+        ensureCoSiblings();
         ensureBehavior();
     }
 
     /**
-     * 找到指定的header和footer，然后赋予对应的Behavior
+     * 找到指定的header, footer, follower (若有)，然后赋予对应的Behavior（若无）
      */
-    private void findHeaderFooter() {
+    private void ensureCoSiblings() {
+        mHeaderView = findCoSibling(mHeaderId, BarHeaderBehavior.class);
+        mFooterView = findCoSibling(mFooterId, BarFooterBehavior.class);
+        mFollowerView = findCoSibling(mFollowerId, BarFollowerBehavior.class);
+    }
+
+
+    private View findCoSibling(int id, Class<? extends CoordinatorLayout.Behavior> behaviorType) {
+        View sibling = null;
         ViewGroup parent = (ViewGroup) getParent();
         if (parent instanceof CoordinatorLayout) { // 只在CoordinatorLayout中生效
-            if (mHeaderId != INVALID_RESOURCE_ID) {
-                mHeaderView = parent.findViewById(mHeaderId);
-                if (mHeaderView != null) {
-                    ((CoordinatorLayout.LayoutParams) mHeaderView.getLayoutParams()).setBehavior(new BarHeaderBehavior());
+            if (id != INVALID_RESOURCE_ID) {
+                sibling = parent.findViewById(id);
+            }
+            if (sibling == null) { // findView 找不到的话则遍历parent底下的设置了对应behavior的View(兼容没有指定unbl_closing_xxx之类的情况)
+                for (int i = 0; i < parent.getChildCount(); i++) {
+                    View child = parent.getChildAt(i);
+                    CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) child.getLayoutParams();
+                    if (layoutParams.getBehavior() != null && layoutParams.getBehavior().getClass() == behaviorType) {
+                        sibling = child;
+                        break;
+                    }
                 }
             }
-            if (mFooterId != INVALID_RESOURCE_ID) {
-                mFooterView = parent.findViewById(mFooterId);
-                if (mFooterView != null) {
-                    ((CoordinatorLayout.LayoutParams) mFooterView.getLayoutParams()).setBehavior(new BarFooterBehavior());
+            if (sibling != null) { // 若找到对应的可以协助兄弟，再看看是否设置了Behavior
+                CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) sibling.getLayoutParams();
+                if (layoutParams.getBehavior() == null || layoutParams.getBehavior().getClass() != behaviorType) {
+                    try {
+                        layoutParams.setBehavior(behaviorType.newInstance());
+                    } catch (InstantiationException e) {
+                    } catch (IllegalAccessException e) {
+                    }
                 }
             }
         }
+
+        return sibling;
+
     }
 
     private void ensureBehavior() {
@@ -127,7 +152,7 @@ public class UcNewsBarLayout extends FrameLayout {
         int height = 0;
         if (mHeaderView != null) {
             CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) mHeaderView.getLayoutParams();
-            height = mHeaderView.getMeasuredHeight() /*+ layoutParams.topMargin + layoutParams.bottomMargin*/; // FIXME: 17/5/29 HeaderBehavior中的实现是改变topMargin
+            height = mHeaderView.getMeasuredHeight() /*+ layoutParams.topMargin + layoutParams.bottomMargin*/; // FIXME: 17/5/29 BarHeaderBehavior中的实现是改变topMargin
         }
         return height;
     }

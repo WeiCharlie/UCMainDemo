@@ -14,6 +14,7 @@
         <attr name="unbl_offset_range" format="reference" />
         <attr name="unbl_closing_header" format="reference" />
         <attr name="unbl_closing_footer" format="reference" />
+        <attr name="unbl_closing_follower" format="reference" />
     </declare-styleable>
 
 </resources>

@@ -23,6 +23,7 @@
             android:layout_height="wrap_content"
             app:unbl_closing_footer="@+id/news_tabLayout"
             app:unbl_closing_header="@+id/titlebar_layout"
+            app:unbl_closing_follower="@+id/news_viewPager"
             app:unbl_offset_range="@dimen/uc_news_bar_offset">
 
             <ImageView
