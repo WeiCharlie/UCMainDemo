@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.kido.ucmaindemo.adapter.RecyclerViewAdapter;
 import com.kido.ucmaindemo.widget.refresh.KSwipeRefreshLayout;
@@ -118,11 +119,19 @@ public class NewsTagFragment extends Fragment {
     }
 
     private void initData() {
-        ArrayList<String> dataList = new ArrayList<>();
+        final ArrayList<String> dataList = new ArrayList<>();
         for (int i = 0; i < 40; i++) {
             dataList.add("This is the title. (" + mTitle + i + ")");
         }
-        mRecyclerView.setAdapter(new RecyclerViewAdapter(dataList));
+        RecyclerViewAdapter adapter = new RecyclerViewAdapter(dataList);
+        mRecyclerView.setAdapter(adapter);
+        adapter.setOnItemClickListener(new RecyclerViewAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                Toast.makeText(getContext(), dataList.get(position), Toast.LENGTH_LONG).show();
+            }
+        });
+
     }
 
 }
