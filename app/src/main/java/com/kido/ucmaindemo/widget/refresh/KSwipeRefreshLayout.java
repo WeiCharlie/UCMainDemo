@@ -45,6 +45,7 @@ import android.widget.AbsListView;
 
 import com.kido.ucmaindemo.BuildConfig;
 import com.kido.ucmaindemo.R;
+import com.kido.ucmaindemo.utils.Logger;
 
 /**
  * Copy from Android design library.
@@ -233,7 +234,7 @@ public class KSwipeRefreshLayout extends ViewGroup implements NestedScrollingPar
      * @param rate
      */
     public void setTerminalRate(float rate) {
-        if(rate > 1f) {
+        if (rate > 1f) {
             mTerminalRate = rate;
         }
     }
@@ -1023,14 +1024,13 @@ public class KSwipeRefreshLayout extends ViewGroup implements NestedScrollingPar
         float extraMove = (slingshotDist) * tensionPercent * 2;
 
         int targetY = mOriginalOffsetTop + (int) ((slingshotDist * dragPercent) + extraMove);
-        if (BuildConfig.DEBUG) {
-            String logInfo = String.format("overscrollTop=%s, originalDragPercent=%s, dragPercent=%s, adjustedPercent=%s, extraOS=%s, " +
-                            "slingshotDist=%s, tensionSlingshotPercent=%s, tensionPercent=%s, extraMove=%s, targetY=%s, mSpinnerOffsetEnd=%s, mOriginalOffsetTop=%s",
-                    overscrollTop, originalDragPercent, dragPercent, adjustedPercent, extraOS,
-                    slingshotDist, tensionSlingshotPercent, tensionPercent, extraMove, targetY, mSpinnerOffsetEnd, mOriginalOffsetTop
-            );
-            Log.d(LOG_TAG, "moveSpinner->logInfo=" + logInfo);
-        }
+
+        Logger.d(LOG_TAG, "moveSpinner-> overscrollTop=%s, originalDragPercent=%s, dragPercent=%s, adjustedPercent=%s, extraOS=%s, " +
+                        "slingshotDist=%s, tensionSlingshotPercent=%s, tensionPercent=%s, extraMove=%s, targetY=%s, mSpinnerOffsetEnd=%s, mOriginalOffsetTop=%s",
+                overscrollTop, originalDragPercent, dragPercent, adjustedPercent, extraOS,
+                slingshotDist, tensionSlingshotPercent, tensionPercent, extraMove, targetY, mSpinnerOffsetEnd, mOriginalOffsetTop
+
+        );
         // where 1.0f is a full circle
         if (mCircleView.getVisibility() != View.VISIBLE) {
             mCircleView.setVisibility(View.VISIBLE);
@@ -1073,9 +1073,7 @@ public class KSwipeRefreshLayout extends ViewGroup implements NestedScrollingPar
     }
 
     private void finishSpinner(float overscrollTop) {
-        if (BuildConfig.DEBUG) {
-            Log.e(LOG_TAG, "finishSpinner->overscrollTop=" + overscrollTop + ", mTotalDragDistance=" + mTotalDragDistance);
-        }
+        Logger.e(LOG_TAG, "finishSpinner->overscrollTop=" + overscrollTop + ", mTotalDragDistance=" + mTotalDragDistance);
         if (overscrollTop > mTotalDragDistance && (!mTerminalEnable || overscrollTop < mTotalDragDistance * mTerminalRate)) {
             setRefreshing(true, true /* notify */);
         } else {
@@ -1085,9 +1083,7 @@ public class KSwipeRefreshLayout extends ViewGroup implements NestedScrollingPar
                 if (overscrollTop >= mTotalDragDistance * mTerminalRate) {
                     if (mListener != null) {
                         mListener.onTerminal();
-                        if (BuildConfig.DEBUG) {
-                            Log.e(LOG_TAG, "finishSpinner->onTerminal()");
-                        }
+                        Logger.e(LOG_TAG, "finishSpinner->onTerminal()");
                     }
                 }
             }
