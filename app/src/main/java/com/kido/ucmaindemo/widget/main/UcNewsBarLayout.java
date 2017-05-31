@@ -231,6 +231,8 @@ public class UcNewsBarLayout extends FrameLayout {
         public static final int DURATION_SHORT = 300;
         public static final int DURATION_LONG = 600;
 
+        private float DRAG_DIVIDE = 5.0f; // 用于消耗下拉dy
+
         private int mCurState = STATE_OPENED;
         private OnPagerStateListener mPagerStateListener;
 
@@ -330,12 +332,12 @@ public class UcNewsBarLayout extends FrameLayout {
         public void onNestedPreScroll(CoordinatorLayout coordinatorLayout, View child, View target, int dx, int dy, int[] consumed) {
             super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed);
             //dy>0 scroll up;dy<0,scroll down
-            float halfOfDis = dy / 5.0f; // 为了不那么敏感
-            Logger.d(TAG, "onNestedPreScroll-> dy=%s, halfOfDis=%s", dy, halfOfDis);
-            if (!canScroll(child, halfOfDis)) {
-                child.setTranslationY(halfOfDis > 0 ? getBarOffsetRange(child) : 0);
+            float dealDis = dy / DRAG_DIVIDE; // 处理过的dis，为了不那么敏感
+            Logger.d(TAG, "onNestedPreScroll-> dy=%s, dealDis=%s", dy, dealDis);
+            if (!canScroll(child, dealDis)) {
+                child.setTranslationY(dealDis > 0 ? getBarOffsetRange(child) : 0);
             } else {
-                child.setTranslationY(child.getTranslationY() - halfOfDis);
+                child.setTranslationY(child.getTranslationY() - dealDis);
             }
             //consumed all scroll behavior after we started Nested Scrolling
             consumed[1] = dy;
@@ -431,8 +433,8 @@ public class UcNewsBarLayout extends FrameLayout {
                 float curTranslationY = ViewCompat.getTranslationY(mLayout);
                 float dy = barOffset - curTranslationY;
 
-                int startY = Math.round(curTranslationY - 0.1f);
-                int deltaY = Math.round(dy + 0.1f);
+                int startY = (int) curTranslationY;
+                int deltaY = barOffset - startY;
                 Logger.d(TAG, "scrollToClose-> barOffset=%s, curTranslationY=%s, dy=%s, startY=%s, deltaY=%s",
                         barOffset, curTranslationY, dy, startY, deltaY);
 
@@ -544,13 +546,13 @@ public class UcNewsBarLayout extends FrameLayout {
 
             float childTransY = dependency.getTranslationY() == 0 ? 0 :
                     dependency.getTranslationY() == dependencyOffsetRange ? childOffsetRange :
-                            (dependency.getTranslationY() / (dependencyOffsetRange * 1.0f) * childOffsetRange);
+                            ((float) Math.floor(dependency.getTranslationY()) / (dependencyOffsetRange * 1.0f) * childOffsetRange);
             Logger.d(TAG, "offsetChildAsNeeded-> dependency.getTranslationY()=%s, dependencyOffsetRange=%s, childOffsetRange=%s, childTransY=%s",
                     dependency.getTranslationY(), dependencyOffsetRange, childOffsetRange, childTransY);
             if (Math.abs(childTransY) > Math.abs(childOffsetRange)) {
                 childTransY = childOffsetRange;
             }
-
+            Logger.d(TAG, "offsetChildAsNeeded-> real childTransY=%s", childTransY);
             child.setTranslationY(childTransY);
 
         }
@@ -612,19 +614,19 @@ public class UcNewsBarLayout extends FrameLayout {
 
         private void offsetChildAsNeeded(CoordinatorLayout parent, View child, View dependency) {
             float childOffsetRange = dependency.getTop() + getFinalTopHeight(dependency) - child.getTop();
-            // float childOffsetRange = -(child.getTop() - dependency.getTop() - getFinalTopHeight(dependency));
+//             float childOffsetRange = -(dependency.getMeasuredHeight() - getFinalTopHeight(dependency));
             int dependencyOffsetRange = getBarOffsetRange(dependency);
 
             float childTransY = dependency.getTranslationY() == 0 ? 0 :
                     dependency.getTranslationY() == dependencyOffsetRange ? childOffsetRange :
-                            (dependency.getTranslationY() / (dependencyOffsetRange * 1.0f) * childOffsetRange);
+                            ((float) Math.floor(dependency.getTranslationY()) / (dependencyOffsetRange * 1.0f) * childOffsetRange);
             Logger.d(TAG, "offsetChildAsNeeded-> dependency.getTranslationY()=%s, dependencyOffsetRange=%s, childOffsetRange=%s, childTransY=%s",
                     dependency.getTranslationY(), dependencyOffsetRange, childOffsetRange, childTransY);
 
             if (Math.abs(childTransY) > Math.abs(childOffsetRange)) {
                 childTransY = childOffsetRange;
             }
-
+            Logger.d(TAG, "offsetChildAsNeeded-> real childTransY=%s", childTransY);
             child.setTranslationY(childTransY);
 
         }
@@ -691,13 +693,13 @@ public class UcNewsBarLayout extends FrameLayout {
 
             float childTransY = dependency.getTranslationY() == 0 ? 0 :
                     dependency.getTranslationY() == dependencyOffsetRange ? childOffsetRange :
-                            (dependency.getTranslationY() / (dependencyOffsetRange * 1.0f) * childOffsetRange);
+                            ((float) Math.floor(dependency.getTranslationY()) / (dependencyOffsetRange * 1.0f) * childOffsetRange);
             Logger.d(TAG, "offsetChildAsNeeded-> dependency.getTranslationY()=%s, dependencyOffsetRange=%s, childOffsetRange=%s, childTransY=%s",
                     dependency.getTranslationY(), dependencyOffsetRange, childOffsetRange, childTransY);
             if (Math.abs(childTransY) > Math.abs(childOffsetRange)) {
                 childTransY = childOffsetRange;
             }
-
+            Logger.d(TAG, "offsetChildAsNeeded-> real childTransY=%s", childTransY);
             child.setTranslationY(childTransY);
         }
 
