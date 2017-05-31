@@ -2,6 +2,11 @@
     <string name="app_name">UCMainDemo</string>
     <string name="uc_news">UC头条</string>
 
+    <string name="activity_UcNewsBarLayout">首页入口</string>
+    <string name="activity_OnlyUcNews">头条页面</string>
+
+
+
     <string-array name="news_tab_titles">
         <item>推荐</item>
         <item>国际</item>
@@ -13,9 +18,9 @@
         <item>广州</item>
     </string-array>
 
-    <string name="behavior_contents">com.kido.ucmaindemo.behavior.UcNewsContentBehavior</string>
-    <string name="behavior_uc_header_pager">com.kido.ucmaindemo.behavior.UcNewsHeaderPagerBehavior</string>
-    <string name="behavior_uc_title">com.kido.ucmaindemo.behavior.UcNewsTitleBehavior</string>
-    <string name="behavior_uc_news_tab">com.kido.ucmaindemo.behavior.UcNewsTabBehavior</string>
-    
+    <string name="behavior_bar">com.kido.ucmaindemo.widget.main.UcNewsBarLayout$Behavior</string>
+    <string name="behavior_header">com.kido.ucmaindemo.widget.main.UcNewsBarLayout$BarHeaderBehavior</string>
+    <string name="behavior_footer">com.kido.ucmaindemo.widget.main.UcNewsBarLayout$BarFooterBehavior</string>
+    <string name="behavior_follower">com.kido.ucmaindemo.widget.main.UcNewsBarLayout$BarFollowerBehavior</string>
+
 </resources>

@@ -330,7 +330,7 @@ public class UcNewsBarLayout extends FrameLayout {
         public void onNestedPreScroll(CoordinatorLayout coordinatorLayout, View child, View target, int dx, int dy, int[] consumed) {
             super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed);
             //dy>0 scroll up;dy<0,scroll down
-            float halfOfDis = dy / 4.0f; // 为了不那么敏感
+            float halfOfDis = dy / 5.0f; // 为了不那么敏感
             if (!canScroll(child, halfOfDis)) {
                 child.setTranslationY(halfOfDis > 0 ? getBarOffsetRange(child) : 0);
             } else {
@@ -615,15 +615,15 @@ public class UcNewsBarLayout extends FrameLayout {
         }
 
         private void offsetChildAsNeeded(CoordinatorLayout parent, View child, View dependency) {
-            float offsetRange = dependency.getTop() + getFinalTopHeight(dependency) - child.getTop();
+            float childOffsetRange = dependency.getTop() + getFinalTopHeight(dependency) - child.getTop();
             // float offsetRange = -(child.getTop() - dependency.getTop() - getFinalTopHeight(dependency));
-            int headerOffsetRange = getBarOffsetRange(dependency);
-            if (dependency.getTranslationY() == headerOffsetRange) {
-                child.setTranslationY(offsetRange);
+            int dependencyOffsetRange = getBarOffsetRange(dependency);
+            if (dependency.getTranslationY() == dependencyOffsetRange) {
+                child.setTranslationY(childOffsetRange);
             } else if (dependency.getTranslationY() == 0) {
                 child.setTranslationY(0);
             } else {
-                child.setTranslationY((int) (dependency.getTranslationY() / (getBarOffsetRange(dependency) * 1.0f) * offsetRange));
+                child.setTranslationY((int) (dependency.getTranslationY() / (dependencyOffsetRange * 1.0f) * childOffsetRange));
             }
         }
 
@@ -687,7 +687,14 @@ public class UcNewsBarLayout extends FrameLayout {
         }
 
         private void offsetChildAsNeeded(CoordinatorLayout parent, View child, View dependency) {
-            child.setTranslationY((int) (-dependency.getTranslationY() / (getBarOffsetRange(dependency) * 1.0f) * getScrollRange(dependency)));
+            float childOffsetRange = -getScrollRange(dependency);
+            int dependencyOffsetRange = getBarOffsetRange(dependency);
+            /*if (dependency.getTranslationY() == dependencyOffsetRange) {
+                child.setTranslationY(childOffsetRange);
+            } else if (dependency.getTranslationY() == 0) {
+                child.setTranslationY(0);
+            } else {*/
+                child.setTranslationY((int) (dependency.getTranslationY() / (dependencyOffsetRange * 1.0f) * childOffsetRange));
         }
 
 
