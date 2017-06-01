@@ -104,15 +104,16 @@ public class MainActivity extends AppCompatActivity {
     private void gotoUcNews() {
         try {
             mRootContainer.removeView(mRefreshLayout);
-            if (mOnlyUcNewsLayout == null) {
-                mOnlyUcNewsLayout = new OnlyUcNewsLayout(MainActivity.this);
-                mOnlyUcNewsLayout.setOnGobackListener(new OnlyUcNewsLayout.OnGobackListener() {
-                    @Override
-                    public void onGoback() {
-                        gobackHome();
-                    }
-                });
+            if (mOnlyUcNewsLayout != null) {
+                mRootContainer.removeView(mOnlyUcNewsLayout);
             }
+            mOnlyUcNewsLayout = new OnlyUcNewsLayout(MainActivity.this);
+            mOnlyUcNewsLayout.setOnGobackListener(new OnlyUcNewsLayout.OnGobackListener() {
+                @Override
+                public void onGoback() {
+                    gobackHome();
+                }
+            });
             mRootContainer.addView(mOnlyUcNewsLayout, FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
         } catch (Exception e) {
 

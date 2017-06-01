@@ -5,7 +5,6 @@ import android.content.Context;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.OverScroller;
 
@@ -39,6 +38,8 @@ public class BarBehavior extends ViewOffsetBehavior {
 
     private WeakReference<CoordinatorLayout> mParent;
     private WeakReference<View> mChild;
+
+    private boolean mWasNestedFlung;
 
 
     public void setPagerStateListener(OnPagerStateListener pagerStateListener) {
@@ -78,12 +79,26 @@ public class BarBehavior extends ViewOffsetBehavior {
     public boolean onNestedPreFling(CoordinatorLayout coordinatorLayout, View child, View target, float velocityX, float velocityY) {
         // consumed the flinging behavior until Closed
         Logger.d(TAG, "onNestedPreFling: velocityX=%s, velocityY=%s", velocityX, velocityY);
-        return !isClosed(child);
+        boolean consumed = !isClosed(child);
+        mWasNestedFlung = true;
+        closePager();
+        return consumed;
     }
 
+//    @Override
+//    public boolean onNestedFling(CoordinatorLayout coordinatorLayout, View child, View target, float velocityX, float velocityY, boolean consumed) {
+//        boolean flung = false;
+//        if (!consumed) {
+//            closePager();
+//        } else {
+//            closePager();
+//            flung = true;
+//        }
+//        return flung;
+//    }
 
     private boolean isClosed(View child) {
-        boolean isClosed = child.getTranslationY() == getBarOffsetRange(child);
+        boolean isClosed = child.getTranslationY() <= getBarOffsetRange(child);
         return isClosed;
     }
 
@@ -117,15 +132,15 @@ public class BarBehavior extends ViewOffsetBehavior {
         return false;
     }
 
-    @Override
-    public boolean onInterceptTouchEvent(CoordinatorLayout parent, final View child, MotionEvent ev) {
-        Logger.d(TAG, "onInterceptTouchEvent:");
-        ensureScroller(child.getContext());
-        if (ev.getAction() == MotionEvent.ACTION_UP && !isClosed()) {
-            handleActionUp(parent, child);
-        }
-        return super.onInterceptTouchEvent(parent, child, ev);
-    }
+//    @Override
+//    public boolean onInterceptTouchEvent(CoordinatorLayout parent, final View child, MotionEvent ev) {
+//        Logger.d(TAG, "onInterceptTouchEvent:");
+//        ensureScroller(child.getContext());
+//        if (ev.getAction() == MotionEvent.ACTION_UP && !isClosed()) {
+//            handleActionUp(parent, child);
+//        }
+//        return super.onInterceptTouchEvent(parent, child, ev);
+//    }
 
     @Override
     public void onNestedPreScroll(CoordinatorLayout coordinatorLayout, View child, View target, int dx, int dy, int[] consumed) {
@@ -145,9 +160,12 @@ public class BarBehavior extends ViewOffsetBehavior {
     @Override
     public void onStopNestedScroll(CoordinatorLayout coordinatorLayout, View child, View target) {
         super.onStopNestedScroll(coordinatorLayout, child, target);
-        if (!isClosed()) {
-            handleActionUp(coordinatorLayout, child);
+        if(!mWasNestedFlung) {
+            if (!isClosed()) {
+                handleActionUp(coordinatorLayout, child);
+            }
         }
+        mWasNestedFlung = false;
     }
 
     private int getBarOffsetRange(View child) {
@@ -159,7 +177,8 @@ public class BarBehavior extends ViewOffsetBehavior {
 
 
     private void handleActionUp(CoordinatorLayout parent, final View child) {
-        Logger.d(TAG, "handleActionUp: ");
+        boolean isClosed = isClosed(child);
+        Logger.d(TAG, "handleActionUp: isClosed=" + isClosed);
         if (mFlingRunnable != null) {
             child.removeCallbacks(mFlingRunnable);
             mFlingRunnable = null;
