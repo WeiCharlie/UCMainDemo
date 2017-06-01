@@ -1,8 +1,5 @@
 package com.kido.ucmaindemo.widget.main.behavior;
 
-/**
- * @author Kido
- */
 
 import android.content.Context;
 import android.support.design.widget.CoordinatorLayout;
@@ -19,8 +16,9 @@ import com.kido.ucmaindemo.widget.main.helper.ViewOffsetBehavior;
 import java.lang.ref.WeakReference;
 
 /**
- * ********************* Behavior for Bar **************************
- * ********************* Behavior for Bar **************************
+ * Behavior for Bar.
+ *
+ * @author Kido
  */
 
 public class BarBehavior extends ViewOffsetBehavior {
@@ -30,7 +28,9 @@ public class BarBehavior extends ViewOffsetBehavior {
     public static final int DURATION_SHORT = 300;
     public static final int DURATION_LONG = 600;
 
-    private static final float DRAG_RATE = 0.2f; // 用于消耗下拉dy
+    private static final float DRAG_RATE = 1f / 5f; // 用于消耗下拉dy
+
+    private static final float UP_DOWN_DIVIDE = 1f / 3f; // 超过该分割线的话松开是自动合拢
 
     private int mCurState = STATE_OPENED;
     private OnPagerStateListener mPagerStateListener;
@@ -165,7 +165,7 @@ public class BarBehavior extends ViewOffsetBehavior {
             mFlingRunnable = null;
         }
         mFlingRunnable = new FlingRunnable(parent, child);
-        if (child.getTranslationY() < getBarOffsetRange(child) / 3.0f) {
+        if (child.getTranslationY() < getBarOffsetRange(child) * UP_DOWN_DIVIDE) {
             mFlingRunnable.scrollToClosed(DURATION_SHORT);
         } else {
             mFlingRunnable.scrollToOpen(DURATION_SHORT);

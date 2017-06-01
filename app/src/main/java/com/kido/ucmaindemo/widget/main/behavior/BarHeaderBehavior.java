@@ -9,12 +9,11 @@ import com.kido.ucmaindemo.utils.Logger;
 import com.kido.ucmaindemo.widget.main.UcNewsBarLayout;
 
 /**
+ * Behavior for Bar Header.
+ * <p>
+ * e.g. TitleLayout
+ *
  * @author Kido
- */
-
-/**
- * ********************* Behavior for Bar Header **************************
- * ********************* Behavior for Bar Header **************************
  */
 
 public class BarHeaderBehavior extends CoordinatorLayout.Behavior<View> {
