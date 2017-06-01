@@ -4,14 +4,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+import android.widget.ListView;
 
-import com.kido.ucmaindemo.adapter.RecyclerViewAdapter;
+import com.kido.ucmaindemo.adapter.ListViewAdapter;
 import com.kido.ucmaindemo.widget.refresh.KSwipeRefreshLayout;
 
 import java.util.ArrayList;
@@ -25,7 +23,7 @@ import java.util.List;
 public class NewsTagFragment extends Fragment {
     private static final String KEY_TITLE = "title";
 
-    private RecyclerView mRecyclerView;
+    private ListView mListView;
     private KSwipeRefreshLayout mRefreshLayout;
 
     private String mTitle = "";
@@ -56,9 +54,9 @@ public class NewsTagFragment extends Fragment {
 
     private void initView(View rootView) {
         mTitle = getArguments().getString(KEY_TITLE);
-        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
+        mListView = (ListView) rootView.findViewById(R.id.recyclerView);
         mRefreshLayout = (KSwipeRefreshLayout) rootView.findViewById(R.id.refresh_layout);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
+//        mListView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
         mRefreshLayout.setOnRefreshListener(new KSwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -82,8 +80,8 @@ public class NewsTagFragment extends Fragment {
         return mRefreshLayout;
     }
 
-    public RecyclerView getRecyclerView() {
-        return mRecyclerView;
+    public ListView getRecyclerView() {
+        return mListView;
     }
 
     public void setRefreshEnable(boolean refreshEnable) {
@@ -93,8 +91,8 @@ public class NewsTagFragment extends Fragment {
     }
 
     public void scrollToTop() {
-        if (mRecyclerView != null) {
-            mRecyclerView.scrollToPosition(0);
+        if (mListView != null) {
+            mListView.setSelection(0);
         }
     }
 
@@ -123,14 +121,14 @@ public class NewsTagFragment extends Fragment {
         for (int i = 0; i < 40; i++) {
             dataList.add("This is the title. (" + mTitle + i + ")");
         }
-        RecyclerViewAdapter adapter = new RecyclerViewAdapter(dataList);
-        mRecyclerView.setAdapter(adapter);
-        adapter.setOnItemClickListener(new RecyclerViewAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-                Toast.makeText(getContext(), dataList.get(position), Toast.LENGTH_LONG).show();
-            }
-        });
+//        RecyclerViewAdapter adapter = new RecyclerViewAdapter(dataList);
+//        adapter.setOnItemClickListener(new RecyclerViewAdapter.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(View view, int position) {
+//                Toast.makeText(getContext(), dataList.get(position), Toast.LENGTH_LONG).show();
+//            }
+//        });
+        mListView.setAdapter(new ListViewAdapter(getContext(), dataList));
 
     }
 

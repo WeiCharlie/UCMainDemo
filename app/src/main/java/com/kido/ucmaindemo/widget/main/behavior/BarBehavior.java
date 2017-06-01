@@ -142,6 +142,13 @@ public class BarBehavior extends ViewOffsetBehavior {
         consumed[1] = dy;
     }
 
+    @Override
+    public void onStopNestedScroll(CoordinatorLayout coordinatorLayout, View child, View target) {
+        super.onStopNestedScroll(coordinatorLayout, child, target);
+        if (!isClosed()) {
+            handleActionUp(coordinatorLayout, child);
+        }
+    }
 
     private int getBarOffsetRange(View child) {
         if (child instanceof UcNewsBarLayout) {
