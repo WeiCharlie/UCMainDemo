@@ -7,12 +7,14 @@ import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
+import com.kido.ucmaindemo.widget.main.behavior.BarFollowerBehavior;
+
 /**
  * 多个新闻列表的容器
  *
  * @author Kido
  */
-@CoordinatorLayout.DefaultBehavior(UcNewsBarLayout.BarFollowerBehavior.class)
+@CoordinatorLayout.DefaultBehavior(BarFollowerBehavior.class)
 public class UcNewsContentPager extends ViewPager {
 
     private boolean isPagingEnabled = true;

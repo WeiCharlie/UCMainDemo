@@ -6,21 +6,16 @@ import android.support.annotation.AttrRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.OverScroller;
 
 import com.kido.ucmaindemo.R;
-import com.kido.ucmaindemo.utils.Logger;
-import com.kido.ucmaindemo.widget.main.helper.HeaderScrollingViewBehavior;
-import com.kido.ucmaindemo.widget.main.helper.ViewOffsetBehavior;
-
-import java.lang.ref.WeakReference;
-import java.util.List;
+import com.kido.ucmaindemo.widget.main.behavior.BarBehavior;
+import com.kido.ucmaindemo.widget.main.behavior.BarFollowerBehavior;
+import com.kido.ucmaindemo.widget.main.behavior.BarFooterBehavior;
+import com.kido.ucmaindemo.widget.main.behavior.BarHeaderBehavior;
 
 
 /**
@@ -31,10 +26,10 @@ import java.util.List;
  *
  * @author Kido
  */
-@CoordinatorLayout.DefaultBehavior(UcNewsBarLayout.Behavior.class)
+@CoordinatorLayout.DefaultBehavior(BarBehavior.class)
 public class UcNewsBarLayout extends FrameLayout {
 
-    private UcNewsBarLayout.Behavior mBehavior;
+    private BarBehavior mBehavior;
     private OnBarStateListener mBarStateListener;
     private Context mContext;
 
@@ -129,10 +124,38 @@ public class UcNewsBarLayout extends FrameLayout {
     private void ensureBehavior() {
         if (mBehavior == null) {
             if (getLayoutParams() instanceof CoordinatorLayout.LayoutParams) {
-                CoordinatorLayout.LayoutParams coParams = (CoordinatorLayout.LayoutParams) getLayoutParams();
-                if (coParams.getBehavior() instanceof UcNewsBarLayout.Behavior) {
-                    mBehavior = (UcNewsBarLayout.Behavior) coParams.getBehavior();
-                    mBehavior.setPagerStateListener(mBarStateListener);
+                final CoordinatorLayout.LayoutParams coParams = (CoordinatorLayout.LayoutParams) getLayoutParams();
+                if (coParams.getBehavior() instanceof BarBehavior) {
+                    mBehavior = (BarBehavior) coParams.getBehavior();
+                    mBehavior.setPagerStateListener(new BarBehavior.OnPagerStateListener() {
+                        @Override
+                        public void onBarStartClosing() {
+                            if (mBarStateListener != null) {
+                                mBarStateListener.onBarStartClosing();
+                            }
+                        }
+
+                        @Override
+                        public void onBarStartOpening() {
+                            if (mBarStateListener != null) {
+                                mBarStateListener.onBarStartOpening();
+                            }
+                        }
+
+                        @Override
+                        public void onBarClosed() {
+                            if (mBarStateListener != null) {
+                                mBarStateListener.onBarClosed();
+                            }
+                        }
+
+                        @Override
+                        public void onBarOpened() {
+                            if (mBarStateListener != null) {
+                                mBarStateListener.onBarOpened();
+                            }
+                        }
+                    });
                 }
             }
         }
@@ -187,9 +210,6 @@ public class UcNewsBarLayout extends FrameLayout {
 
     public void setBarStateListener(OnBarStateListener listener) {
         mBarStateListener = listener;
-        if (mBehavior != null) {
-            mBehavior.setPagerStateListener(mBarStateListener);
-        }
     }
 
     public void openBar() {
@@ -215,533 +235,8 @@ public class UcNewsBarLayout extends FrameLayout {
     /**
      * callback for HeaderPager 's state
      */
-    public interface OnBarStateListener extends Behavior.OnPagerStateListener {
+    public interface OnBarStateListener extends BarBehavior.OnPagerStateListener {
     }
 
-
-    /**
-     * ********************* Behavior for Bar **************************
-     * ********************* Behavior for Bar **************************
-     */
-
-    public static class Behavior extends ViewOffsetBehavior {
-        private static final String TAG = "UNBL_Behavior";
-        public static final int STATE_OPENED = 0;
-        public static final int STATE_CLOSED = 1;
-        public static final int DURATION_SHORT = 300;
-        public static final int DURATION_LONG = 600;
-
-        private float DRAG_DIVIDE = 5.0f; // 用于消耗下拉dy
-
-        private int mCurState = STATE_OPENED;
-        private OnPagerStateListener mPagerStateListener;
-
-        private OverScroller mOverScroller;
-
-        private WeakReference<CoordinatorLayout> mParent;
-        private WeakReference<View> mChild;
-
-
-        public void setPagerStateListener(OnPagerStateListener pagerStateListener) {
-            mPagerStateListener = pagerStateListener;
-        }
-
-        public Behavior() {
-        }
-
-        public Behavior(Context context, AttributeSet attrs) {
-            super(context, attrs);
-        }
-
-        private void ensureScroller(Context context) {
-            if (mOverScroller == null) {
-                mOverScroller = new OverScroller(context);
-            }
-        }
-
-        @Override
-        protected void layoutChild(CoordinatorLayout parent, View child, int layoutDirection) {
-            super.layoutChild(parent, child, layoutDirection);
-            mParent = new WeakReference<CoordinatorLayout>(parent);
-            mChild = new WeakReference<View>(child);
-            ensureScroller(child.getContext());
-        }
-
-        @Override
-        public boolean onStartNestedScroll(CoordinatorLayout coordinatorLayout, View child, View directTargetChild, View target, int nestedScrollAxes) {
-            Logger.d(TAG, "onStartNestedScroll: nestedScrollAxes=%s", nestedScrollAxes);
-            ensureScroller(child.getContext());
-            return (nestedScrollAxes & ViewCompat.SCROLL_AXIS_VERTICAL) != 0 && canScroll(child, 0) && !isClosed(child);
-        }
-
-
-        @Override
-        public boolean onNestedPreFling(CoordinatorLayout coordinatorLayout, View child, View target, float velocityX, float velocityY) {
-            // consumed the flinging behavior until Closed
-            Logger.d(TAG, "onNestedPreFling: velocityX=%s, velocityY=%s", velocityX, velocityY);
-            return !isClosed(child);
-        }
-
-
-        private boolean isClosed(View child) {
-            boolean isClosed = child.getTranslationY() == getBarOffsetRange(child);
-            return isClosed;
-        }
-
-        public boolean isClosed() {
-            return mCurState == STATE_CLOSED;
-        }
-
-
-        private void changeState(int newState) {
-            Logger.d(TAG, "changeState-> newState=%s", newState);
-            if (mCurState != newState) {
-                mCurState = newState;
-                if (mCurState == STATE_OPENED) {
-                    if (mPagerStateListener != null) {
-                        mPagerStateListener.onBarOpened();
-                    }
-                } else {
-                    if (mPagerStateListener != null) {
-                        mPagerStateListener.onBarClosed();
-                    }
-                }
-            }
-
-        }
-
-        private boolean canScroll(View child, float pendingDy) {
-            int pendingTranslationY = (int) (child.getTranslationY() - pendingDy);
-            if (pendingTranslationY >= getBarOffsetRange(child) && pendingTranslationY <= 0) {
-                return true;
-            }
-            return false;
-        }
-
-        @Override
-        public boolean onInterceptTouchEvent(CoordinatorLayout parent, final View child, MotionEvent ev) {
-            Logger.d(TAG, "onInterceptTouchEvent:");
-            ensureScroller(child.getContext());
-            if (ev.getAction() == MotionEvent.ACTION_UP && !isClosed()) {
-                handleActionUp(parent, child);
-            }
-            return super.onInterceptTouchEvent(parent, child, ev);
-        }
-
-        @Override
-        public void onNestedPreScroll(CoordinatorLayout coordinatorLayout, View child, View target, int dx, int dy, int[] consumed) {
-            super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed);
-            //dy>0 scroll up;dy<0,scroll down
-            float dealDis = dy / DRAG_DIVIDE; // 处理过的dis，为了不那么敏感
-            Logger.d(TAG, "onNestedPreScroll-> dy=%s, dealDis=%s", dy, dealDis);
-            if (!canScroll(child, dealDis)) {
-                child.setTranslationY(dealDis > 0 ? getBarOffsetRange(child) : 0);
-            } else {
-                child.setTranslationY(child.getTranslationY() - dealDis);
-            }
-            //consumed all scroll behavior after we started Nested Scrolling
-            consumed[1] = dy;
-        }
-
-
-        private int getBarOffsetRange(View child) {
-            if (child instanceof UcNewsBarLayout) {
-                return ((UcNewsBarLayout) child).getBarOffsetRange();
-            }
-            return 0;
-        }
-
-
-        private void handleActionUp(CoordinatorLayout parent, final View child) {
-            Logger.d(TAG, "handleActionUp: ");
-            if (mFlingRunnable != null) {
-                child.removeCallbacks(mFlingRunnable);
-                mFlingRunnable = null;
-            }
-            mFlingRunnable = new FlingRunnable(parent, child);
-            if (child.getTranslationY() < getBarOffsetRange(child) / 3.0f) {
-                mFlingRunnable.scrollToClosed(DURATION_SHORT);
-            } else {
-                mFlingRunnable.scrollToOpen(DURATION_SHORT);
-            }
-
-        }
-
-        private void onFlingFinished(CoordinatorLayout coordinatorLayout, View layout) {
-            changeState(isClosed(layout) ? STATE_CLOSED : STATE_OPENED);
-        }
-
-        public void openPager() {
-            openPager(DURATION_LONG);
-        }
-
-        /**
-         * @param duration open animation duration
-         */
-        public void openPager(int duration) {
-            View child = mChild.get();
-            CoordinatorLayout parent = mParent.get();
-            if (isClosed() && child != null) {
-                if (mFlingRunnable != null) {
-                    child.removeCallbacks(mFlingRunnable);
-                    mFlingRunnable = null;
-                }
-                mFlingRunnable = new FlingRunnable(parent, child);
-                mFlingRunnable.scrollToOpen(duration);
-            }
-        }
-
-        public void closePager() {
-            closePager(DURATION_LONG);
-        }
-
-        /**
-         * @param duration close animation duration
-         */
-        public void closePager(int duration) {
-            View child = mChild.get();
-            CoordinatorLayout parent = mParent.get();
-            if (!isClosed()) {
-                if (mFlingRunnable != null) {
-                    child.removeCallbacks(mFlingRunnable);
-                    mFlingRunnable = null;
-                }
-                mFlingRunnable = new FlingRunnable(parent, child);
-                mFlingRunnable.scrollToClosed(duration);
-            }
-        }
-
-
-        private FlingRunnable mFlingRunnable;
-
-        /**
-         * For animation , Why not use {@link android.view.ViewPropertyAnimator } to play animation is of the
-         * other {@link CoordinatorLayout.Behavior} that depend on this could not receiving the correct result of
-         * {@link View#getTranslationY()} after animation finished for whatever reason that i don't know
-         */
-        private class FlingRunnable implements Runnable {
-            private final CoordinatorLayout mParent;
-            private final View mLayout;
-
-            FlingRunnable(CoordinatorLayout parent, View layout) {
-                mParent = parent;
-                mLayout = layout;
-            }
-
-            public void scrollToClosed(int duration) {
-                int barOffset = getBarOffsetRange(mLayout);
-                float curTranslationY = ViewCompat.getTranslationY(mLayout);
-                float dy = barOffset - curTranslationY;
-
-                int startY = (int) curTranslationY;
-                int deltaY = barOffset - startY;
-                Logger.d(TAG, "scrollToClose-> barOffset=%s, curTranslationY=%s, dy=%s, startY=%s, deltaY=%s",
-                        barOffset, curTranslationY, dy, startY, deltaY);
-
-                mOverScroller.startScroll(0, startY, 0, deltaY, duration);
-                start();
-                if (mPagerStateListener != null) {
-                    mPagerStateListener.onBarStartClosing();
-                }
-            }
-
-            public void scrollToOpen(int duration) {
-                float curTranslationY = ViewCompat.getTranslationY(mLayout);
-                int startY = (int) curTranslationY;
-                int deltaY = (int) -curTranslationY;
-                Logger.d(TAG, "scrollToOpen-> curTranslationY=%s, startY=%s, deltaY=%s",
-                        curTranslationY, startY, deltaY);
-                mOverScroller.startScroll(0, startY, 0, deltaY, duration);
-                start();
-                if (mPagerStateListener != null) {
-                    mPagerStateListener.onBarStartOpening();
-                }
-            }
-
-            private void start() {
-                if (mOverScroller.computeScrollOffset()) {
-                    mFlingRunnable = new FlingRunnable(mParent, mLayout);
-                    ViewCompat.postOnAnimation(mLayout, mFlingRunnable);
-                } else {
-                    onFlingFinished(mParent, mLayout);
-                }
-            }
-
-
-            @Override
-            public void run() {
-                if (mLayout != null && mOverScroller != null) {
-                    if (mOverScroller.computeScrollOffset()) {
-                        Logger.d(TAG, "FlingRunnable run-> mOverScroller.getCurrY()=%s", mOverScroller.getCurrY());
-                        ViewCompat.setTranslationY(mLayout, mOverScroller.getCurrY());
-                        ViewCompat.postOnAnimation(mLayout, this);
-                    } else {
-                        onFlingFinished(mParent, mLayout);
-                    }
-                }
-            }
-        }
-
-        /**
-         * callback for HeaderPager 's state
-         */
-        public interface OnPagerStateListener {
-
-            void onBarStartClosing();
-
-            void onBarStartOpening();
-
-            /**
-             * do callback when pager closed
-             */
-            void onBarClosed();
-
-            /**
-             * do callback when pager opened
-             */
-            void onBarOpened();
-        }
-
-    }
-
-    /**
-     * ********************* Behavior for Bar Header **************************
-     * ********************* Behavior for Bar Header **************************
-     */
-
-    public static class BarHeaderBehavior extends CoordinatorLayout.Behavior<View> {
-        private static final String TAG = "UNBL_HeaderBehavior";
-
-        public BarHeaderBehavior() {
-        }
-
-        public BarHeaderBehavior(Context context, AttributeSet attrs) {
-            super(context, attrs);
-        }
-
-
-        @Override
-        public boolean onLayoutChild(CoordinatorLayout parent, View child, int layoutDirection) {
-            ((CoordinatorLayout.LayoutParams) child.getLayoutParams()).topMargin = -child.getMeasuredHeight(); //
-            parent.onLayoutChild(child, layoutDirection);
-            Logger.d(TAG, "layoutChild-> top=%s, height=%s", child.getTop(), child.getHeight());
-            return true;
-        }
-
-        @Override
-        public boolean layoutDependsOn(CoordinatorLayout parent, View child, View dependency) {
-            return isDependOn(dependency);
-        }
-
-
-        @Override
-        public boolean onDependentViewChanged(CoordinatorLayout parent, View child, View dependency) {
-            offsetChildAsNeeded(parent, child, dependency);
-            return false;
-        }
-
-        private void offsetChildAsNeeded(CoordinatorLayout parent, View child, View dependency) {
-            int dependencyOffsetRange = getBarOffsetRange(dependency);
-            int childOffsetRange = getTitleOffsetRange(dependency);
-
-            float childTransY = dependency.getTranslationY() == 0 ? 0 :
-                    dependency.getTranslationY() == dependencyOffsetRange ? childOffsetRange :
-                            ((float) Math.floor(dependency.getTranslationY()) / (dependencyOffsetRange * 1.0f) * childOffsetRange);
-            Logger.d(TAG, "offsetChildAsNeeded-> dependency.getTranslationY()=%s, dependencyOffsetRange=%s, childOffsetRange=%s, childTransY=%s",
-                    dependency.getTranslationY(), dependencyOffsetRange, childOffsetRange, childTransY);
-            if (Math.abs(childTransY) > Math.abs(childOffsetRange)) {
-                childTransY = childOffsetRange;
-            }
-            Logger.d(TAG, "offsetChildAsNeeded-> real childTransY=%s", childTransY);
-            child.setTranslationY(childTransY);
-
-        }
-
-        private int getBarOffsetRange(View dependency) {
-            if (dependency instanceof UcNewsBarLayout) {
-                return ((UcNewsBarLayout) dependency).getBarOffsetRange();
-            }
-            return 0;
-        }
-
-        private int getTitleOffsetRange(View dependency) {
-            if (dependency instanceof UcNewsBarLayout) {
-                return ((UcNewsBarLayout) dependency).getHeaderHeight();
-            }
-            return 0;
-        }
-
-
-        private boolean isDependOn(View dependency) {
-            return dependency instanceof UcNewsBarLayout;
-        }
-    }
-
-
-    /**
-     * ********************* Behavior for Bar Footer **************************
-     * ********************* Behavior for Bar Footer **************************
-     */
-
-    public static class BarFooterBehavior extends HeaderScrollingViewBehavior {
-        private static final String TAG = "UNBL_FooterBehavior";
-
-        public BarFooterBehavior() {
-        }
-
-        public BarFooterBehavior(Context context, AttributeSet attrs) {
-            super(context, attrs);
-        }
-
-
-        @Override
-        protected void layoutChild(CoordinatorLayout parent, View child, int layoutDirection) {
-            super.layoutChild(parent, child, layoutDirection);
-            Logger.d(TAG, "layoutChild-> top=%s, height=%s", child.getTop(), child.getHeight());
-        }
-
-        @Override
-        public boolean layoutDependsOn(CoordinatorLayout parent, View child, View dependency) {
-            return isDependOn(dependency);
-        }
-
-
-        @Override
-        public boolean onDependentViewChanged(CoordinatorLayout parent, View child, View dependency) {
-            offsetChildAsNeeded(parent, child, dependency);
-            return false;
-        }
-
-        private void offsetChildAsNeeded(CoordinatorLayout parent, View child, View dependency) {
-            float childOffsetRange = dependency.getTop() + getFinalTopHeight(dependency) - child.getTop();
-//             float childOffsetRange = -(dependency.getMeasuredHeight() - getFinalTopHeight(dependency));
-            int dependencyOffsetRange = getBarOffsetRange(dependency);
-
-            float childTransY = dependency.getTranslationY() == 0 ? 0 :
-                    dependency.getTranslationY() == dependencyOffsetRange ? childOffsetRange :
-                            ((float) Math.floor(dependency.getTranslationY()) / (dependencyOffsetRange * 1.0f) * childOffsetRange);
-            Logger.d(TAG, "offsetChildAsNeeded-> dependency.getTranslationY()=%s, dependencyOffsetRange=%s, childOffsetRange=%s, childTransY=%s",
-                    dependency.getTranslationY(), dependencyOffsetRange, childOffsetRange, childTransY);
-
-            if (Math.abs(childTransY) > Math.abs(childOffsetRange)) {
-                childTransY = childOffsetRange;
-            }
-            Logger.d(TAG, "offsetChildAsNeeded-> real childTransY=%s", childTransY);
-            child.setTranslationY(childTransY);
-
-        }
-
-
-        @Override
-        protected View findFirstDependency(List<View> views) {
-            for (int i = 0, z = views.size(); i < z; i++) {
-                View view = views.get(i);
-                if (isDependOn(view))
-                    return view;
-            }
-            return null;
-        }
-
-        private int getBarOffsetRange(View dependency) {
-            if (dependency instanceof UcNewsBarLayout) {
-                return ((UcNewsBarLayout) dependency).getBarOffsetRange();
-            }
-            return 0;
-        }
-
-        private int getFinalTopHeight(View dependency) {
-            if (dependency instanceof UcNewsBarLayout) {
-                return ((UcNewsBarLayout) dependency).getHeaderHeight();
-            }
-            return 0;
-        }
-
-
-        private boolean isDependOn(View dependency) {
-            return dependency instanceof UcNewsBarLayout;
-        }
-    }
-
-    /**
-     * ********************* Behavior for Bar Follower **************************
-     * ********************* Behavior for Bar Follower **************************
-     */
-    public static class BarFollowerBehavior extends HeaderScrollingViewBehavior {
-        private static final String TAG = "UNBL_FollowerBehavior";
-
-        public BarFollowerBehavior() {
-        }
-
-        public BarFollowerBehavior(Context context, AttributeSet attrs) {
-            super(context, attrs);
-        }
-
-        @Override
-        public boolean layoutDependsOn(CoordinatorLayout parent, View child, View dependency) {
-            return isDependOn(dependency);
-        }
-
-        @Override
-        public boolean onDependentViewChanged(CoordinatorLayout parent, View child, View dependency) {
-            offsetChildAsNeeded(parent, child, dependency);
-            return false;
-        }
-
-        private void offsetChildAsNeeded(CoordinatorLayout parent, View child, View dependency) {
-            int dependencyOffsetRange = getBarOffsetRange(dependency);
-            float childOffsetRange = -getScrollRange(dependency);
-
-            float childTransY = dependency.getTranslationY() == 0 ? 0 :
-                    dependency.getTranslationY() == dependencyOffsetRange ? childOffsetRange :
-                            ((float) Math.floor(dependency.getTranslationY()) / (dependencyOffsetRange * 1.0f) * childOffsetRange);
-            Logger.d(TAG, "offsetChildAsNeeded-> dependency.getTranslationY()=%s, dependencyOffsetRange=%s, childOffsetRange=%s, childTransY=%s",
-                    dependency.getTranslationY(), dependencyOffsetRange, childOffsetRange, childTransY);
-            if (Math.abs(childTransY) > Math.abs(childOffsetRange)) {
-                childTransY = childOffsetRange;
-            }
-            Logger.d(TAG, "offsetChildAsNeeded-> real childTransY=%s", childTransY);
-            child.setTranslationY(childTransY);
-        }
-
-
-        @Override
-        protected View findFirstDependency(List<View> views) {
-            for (int i = 0, z = views.size(); i < z; i++) {
-                View view = views.get(i);
-                if (isDependOn(view))
-                    return view;
-            }
-            return null;
-        }
-
-        @Override
-        protected int getScrollRange(View v) {
-            if (isDependOn(v)) {
-                return Math.max(0, v.getMeasuredHeight() - getFinalTopHeight(v));
-            } else {
-                return super.getScrollRange(v);
-            }
-        }
-
-        private int getBarOffsetRange(View dependency) {
-            if (dependency instanceof UcNewsBarLayout) {
-                return ((UcNewsBarLayout) dependency).getBarOffsetRange();
-            }
-            return 0;
-        }
-
-        private int getFinalTopHeight(View dependency) {
-            if (dependency instanceof UcNewsBarLayout) {
-                UcNewsBarLayout barLayout = ((UcNewsBarLayout) dependency);
-                return barLayout.getHeaderHeight() + barLayout.getFooterHeight();
-            }
-            return 0;
-        }
-
-
-        private boolean isDependOn(View dependency) {
-            return dependency instanceof UcNewsBarLayout;
-        }
-    }
 
 }

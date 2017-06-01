@@ -6,7 +6,6 @@
     <string name="activity_OnlyUcNews">头条页面</string>
 
 
-
     <string-array name="news_tab_titles">
         <item>推荐</item>
         <item>国际</item>
@@ -18,9 +17,6 @@
         <item>广州</item>
     </string-array>
 
-    <string name="behavior_bar">com.kido.ucmaindemo.widget.main.UcNewsBarLayout$Behavior</string>
-    <string name="behavior_header">com.kido.ucmaindemo.widget.main.UcNewsBarLayout$BarHeaderBehavior</string>
-    <string name="behavior_footer">com.kido.ucmaindemo.widget.main.UcNewsBarLayout$BarFooterBehavior</string>
-    <string name="behavior_follower">com.kido.ucmaindemo.widget.main.UcNewsBarLayout$BarFollowerBehavior</string>
+    <string name="behavior_follower">com.kido.ucmaindemo.widget.main.behavior.BarFollowerBehavior</string>
 
 </resources>
