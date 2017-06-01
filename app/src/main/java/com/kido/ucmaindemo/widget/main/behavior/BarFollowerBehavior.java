@@ -13,13 +13,13 @@ import com.kido.ucmaindemo.widget.main.helper.HeaderScrollingViewBehavior;
 import java.util.List;
 
 /**
+ * Behavior for Bar Follower.
+ * <p>
+ * e.g. ViewPager
+ *
  * @author Kido
  */
 
-/**
- * ********************* Behavior for Bar Follower **************************
- * ********************* Behavior for Bar Follower **************************
- */
 public class BarFollowerBehavior extends HeaderScrollingViewBehavior {
     private static final String TAG = "UNBL_FollowerBehavior";
 

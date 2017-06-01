@@ -1,9 +1,5 @@
 package com.kido.ucmaindemo.widget.main.behavior;
 
-/**
- * @author Kido
- */
-
 
 import android.content.Context;
 import android.support.design.widget.CoordinatorLayout;
@@ -17,8 +13,11 @@ import com.kido.ucmaindemo.widget.main.helper.HeaderScrollingViewBehavior;
 import java.util.List;
 
 /**
- * ********************* Behavior for Bar Footer **************************
- * ********************* Behavior for Bar Footer **************************
+ * Behavior for Bar Footer.
+ * <p>
+ * e.g. TabLayout
+ *
+ * @author Kido
  */
 
 public class BarFooterBehavior extends HeaderScrollingViewBehavior {
