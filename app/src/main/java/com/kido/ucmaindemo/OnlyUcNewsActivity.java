@@ -1,17 +1,12 @@
 package com.kido.ucmaindemo;
 
 import android.os.Bundle;
-import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 
-import com.kido.ucmaindemo.adapter.TagFragmentAdapter;
 import com.kido.ucmaindemo.widget.main.UcNewsContentPager;
 import com.kido.ucmaindemo.widget.main.UcNewsTabLayout;
 import com.kido.ucmaindemo.widget.main.UcNewsTitleLayout;
-import com.kido.ucmaindemo.widget.refresh.KSwipeRefreshLayout;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,52 +26,52 @@ public class OnlyUcNewsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_onlyucnews);
-        bindViews();
-        initTitleAndHeader();
-        initTabsAndPager();
+//        bindViews();
+//        initTitleAndHeader();
+//        initTabsAndPager();
     }
-
-    private void bindViews() {
-
-        mTitleLayout = (UcNewsTitleLayout) findViewById(R.id.titlebar_layout);
-        mContentPager = (UcNewsContentPager) findViewById(R.id.news_viewPager);
-        mTabLayout = (UcNewsTabLayout) findViewById(R.id.news_tabLayout);
-
-    }
-
-    private void initTitleAndHeader() {
-        mTitleLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mFragments.get(mContentPager.getCurrentItem()).getRecyclerView().smoothScrollToPosition(0);
-            }
-        });
-    }
-
-
-    private void initTabsAndPager() {
-        String[] newsTabTitles = getResources().getStringArray(R.array.news_tab_titles);
-        mFragments = new ArrayList<>(newsTabTitles.length);
-        for (String title : newsTabTitles) {
-            mTabLayout.addTab(mTabLayout.newTab().setText(title));
-            NewsTagFragment fragment = NewsTagFragment.newInstance(title);
-            fragment.addOnRefreshListener(new KSwipeRefreshLayout.OnRefreshListener() {
-                @Override
-                public void onRefresh() {
-                    // do nothing, because something has been done inside the fragment.
-                }
-
-                @Override
-                public void onTerminal() { // open header to go back home
-                }
-            });
-            mFragments.add(fragment);
-        }
-
-        mTabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
-        mContentPager.setupTabLayout(mTabLayout);
-        mContentPager.setAdapter(new TagFragmentAdapter(getSupportFragmentManager(), mFragments));
-
-    }
+//
+//    private void bindViews() {
+//
+//        mTitleLayout = (UcNewsTitleLayout) findViewById(R.id.titlebar_layout);
+//        mContentPager = (UcNewsContentPager) findViewById(R.id.news_viewPager);
+//        mTabLayout = (UcNewsTabLayout) findViewById(R.id.news_tabLayout);
+//
+//    }
+//
+//    private void initTitleAndHeader() {
+//        mTitleLayout.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                mFragments.get(mContentPager.getCurrentItem()).getRecyclerView().smoothScrollToPosition(0);
+//            }
+//        });
+//    }
+//
+//
+//    private void initTabsAndPager() {
+//        String[] newsTabTitles = getResources().getStringArray(R.array.news_tab_titles);
+//        mFragments = new ArrayList<>(newsTabTitles.length);
+//        for (String title : newsTabTitles) {
+//            mTabLayout.addTab(mTabLayout.newTab().setText(title));
+//            NewsTagFragment fragment = NewsTagFragment.newInstance(title);
+//            fragment.addOnRefreshListener(new KSwipeRefreshLayout.OnRefreshListener() {
+//                @Override
+//                public void onRefresh() {
+//                    // do nothing, because something has been done inside the fragment.
+//                }
+//
+//                @Override
+//                public void onTerminal() { // open header to go back home
+//                }
+//            });
+//            mFragments.add(fragment);
+//        }
+//
+//        mTabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
+//        mContentPager.setupTabLayout(mTabLayout);
+//        mContentPager.setAdapter(new TagFragmentAdapter(getSupportFragmentManager(), mFragments));
+//
+//    }
 }
 

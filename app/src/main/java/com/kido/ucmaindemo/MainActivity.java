@@ -1,9 +1,11 @@
 package com.kido.ucmaindemo;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.kido.ucmaindemo.adapter.TagFragmentAdapter;
@@ -24,6 +26,8 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    private FrameLayout mRootContainer;
+    private OnlyUcNewsLayout mOnlyUcNewsLayout;
     private KSwipeRefreshLayout mRefreshLayout;
     private UcNewsTitleLayout mTitleLayout;
     private UcNewsBarLayout mBarLayout;
@@ -47,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void bindViews() {
 
+        mRootContainer = (FrameLayout) findViewById(R.id.root_container);
         mRefreshLayout = (KSwipeRefreshLayout) findViewById(R.id.root_refresh_layout);
         mTitleLayout = (UcNewsTitleLayout) findViewById(R.id.titlebar_layout);
         mBarLayout = (UcNewsBarLayout) findViewById(R.id.news_header_layout);
@@ -82,14 +87,52 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onBarClosed() {
-                bottomBar.setImageResource(R.drawable.bottom_bar_toutiao);
+//                bottomBar.setImageResource(R.drawable.bottom_bar_toutiao);
+//                mOnlyUcNewsLayout.setVisibility(View.VISIBLE); // 模拟动态添加View
+                gotoUcNews();
             }
 
             @Override
             public void onBarOpened() {
-                bottomBar.setImageResource(R.drawable.bottom_bar_home);
+//                bottomBar.setImageResource(R.drawable.bottom_bar_home);
+//                mOnlyUcNewsLayout.setVisibility(View.GONE);// 模拟动态移除View
+//                gobackHome();
             }
         });
+    }
+
+    private void gotoUcNews() {
+        try {
+            mRootContainer.removeView(mRefreshLayout);
+            if (mOnlyUcNewsLayout == null) {
+                mOnlyUcNewsLayout = new OnlyUcNewsLayout(MainActivity.this);
+                mOnlyUcNewsLayout.setOnGobackListener(new OnlyUcNewsLayout.OnGobackListener() {
+                    @Override
+                    public void onGoback() {
+                        gobackHome();
+                    }
+                });
+            }
+            mRootContainer.addView(mOnlyUcNewsLayout, FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
+        } catch (Exception e) {
+
+        }
+
+    }
+
+    private void gobackHome() {
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    mRootContainer.removeView(mOnlyUcNewsLayout);
+                    mRootContainer.addView(mRefreshLayout);
+                    mBarLayout.openBar();
+                } catch (Exception e) {
+                }
+            }
+        });
+
     }
 
 
@@ -138,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if (mBarLayout.isClosed()) {
-            mBarLayout.openBar();
+            gobackHome();
         } else {
             super.onBackPressed();
         }
