@@ -7,18 +7,40 @@ import android.support.v4.view.NestedScrollingChild;
 import android.support.v4.view.NestedScrollingChildHelper;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.ListView;
+
 
 /**
  * @author Kido
  */
 
 public class NestedListView2 extends ListView implements NestedScrollingChild {
-    private int mLastY;
+
+    private static final String TAG = "NestedListView2";
+    private static final int INVALID_POINTER = -1;
+
+    /**
+     * The RecyclerView is not currently scrolling.
+     */
+    public static final int SCROLL_STATE_IDLE = 0;
+
+    /**
+     * The RecyclerView is currently being dragged by outside input such as user touch input.
+     */
+    public static final int SCROLL_STATE_DRAGGING = 1;
+    private int mScrollState = SCROLL_STATE_IDLE;
+    private int mScrollPointerId = INVALID_POINTER;
+
+    private int mInitialTouchX;
+    private int mInitialTouchY;
+    private int mLastTouchX;
+    private int mLastTouchY;
+    private int mTouchSlop;
     private final int[] mScrollOffset = new int[2];
     private final int[] mScrollConsumed = new int[2];
-    private int mNestedOffsetY;
+    private final int[] mNestedOffsets = new int[2];
     private NestedScrollingChildHelper mChildHelper;
 
     public NestedListView2(Context context) {
@@ -36,59 +58,83 @@ public class NestedListView2 extends ListView implements NestedScrollingChild {
     }
 
     /**
-     *
      * @see android.support.v4.widget.NestedScrollView#onTouchEvent(MotionEvent)
      */
     @Override
-    public boolean onTouchEvent(MotionEvent ev) {
+    public boolean onTouchEvent(MotionEvent e) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            return super.onTouchEvent(ev);
+            return super.onTouchEvent(e);
         }
         boolean returnValue = false;
 
-        MotionEvent event = MotionEvent.obtain(ev);
-        final int action = MotionEventCompat.getActionMasked(event);
+        MotionEvent vtev = MotionEvent.obtain(e);
+        final int action = MotionEventCompat.getActionMasked(e);
+        final int actionIndex = MotionEventCompat.getActionIndex(e);
         if (action == MotionEvent.ACTION_DOWN) {
-            mNestedOffsetY = 0;
+            mNestedOffsets[0] = mNestedOffsets[1] = 0;
         }
-        event.offsetLocation(0, mNestedOffsetY);
-        int eventY = (int) event.getY();
+        vtev.offsetLocation(mNestedOffsets[0], mNestedOffsets[1]);
         switch (action) {
-            case MotionEvent.ACTION_MOVE:
-                int deltaY = mLastY - eventY;
-                // NestedPreScroll
-                if (dispatchNestedPreScroll(0, deltaY, mScrollConsumed, mScrollOffset)) {
-                    deltaY -= mScrollConsumed[1];
-                    mLastY = eventY - mScrollOffset[1];
-                    event.offsetLocation(0, mScrollOffset[1]);
-                    mNestedOffsetY += mScrollOffset[1];
-                }
-                returnValue = super.onTouchEvent(event);
-
-                // NestedScroll
-                if (dispatchNestedScroll(0, mScrollOffset[1], 0, deltaY, mScrollOffset)) {
-                    event.offsetLocation(0, mScrollOffset[1]);
-                    mNestedOffsetY += mScrollOffset[1];
-                    mLastY -= mScrollOffset[1];
-                }
-                break;
             case MotionEvent.ACTION_DOWN:
-                returnValue = super.onTouchEvent(event);
-                mLastY = eventY;
-                // start NestedScroll
+                mScrollPointerId = e.getPointerId(0);
+                mInitialTouchX = mLastTouchX = (int) (e.getX() + 0.5f);
+                mInitialTouchY = mLastTouchY = (int) (e.getY() + 0.5f);
                 startNestedScroll(ViewCompat.SCROLL_AXIS_VERTICAL);
                 break;
-            case MotionEvent.ACTION_UP:
-                // TODO: fling
-                returnValue = super.onTouchEvent(event);
+
+            case MotionEventCompat.ACTION_POINTER_DOWN: {
+                mScrollPointerId = e.getPointerId(actionIndex);
+                mInitialTouchX = mLastTouchX = (int) (e.getX(actionIndex) + 0.5f);
+                mInitialTouchY = mLastTouchY = (int) (e.getY(actionIndex) + 0.5f);
+            }
+            break;
+            case MotionEvent.ACTION_MOVE:
+                final int index = e.findPointerIndex(mScrollPointerId);
+                if (index < 0) {
+                    Log.e(TAG, "Error processing scroll; pointer index for id " +
+                            mScrollPointerId + " not found. Did any MotionEvents get skipped?");
+                    return false;
+                }
+
+                final int x = (int) (e.getX(index) + 0.5f);
+                final int y = (int) (e.getY(index) + 0.5f);
+                int dx = mLastTouchX - x;
+                int dy = mLastTouchY - y;
+
+                if (dispatchNestedPreScroll(dx, dy, mScrollConsumed, mScrollOffset)) {
+                    dx -= mScrollConsumed[0];
+                    dy -= mScrollConsumed[1];
+                    vtev.offsetLocation(mScrollOffset[0], mScrollOffset[1]);
+                    // Updated the nested offsets
+                    mNestedOffsets[0] += mScrollOffset[0];
+                    mNestedOffsets[1] += mScrollOffset[1];
+                }
+                mLastTouchX = x - mScrollOffset[0];
+                mLastTouchY = y - mScrollOffset[1];
                 break;
+            case MotionEventCompat.ACTION_POINTER_UP: {
+                onPointerUp(e);
+            }
+            break;
+            case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
-                returnValue = super.onTouchEvent(event);
                 // end NestedScroll
                 stopNestedScroll();
                 break;
         }
-        return returnValue;
+        vtev.recycle();
+        return super.onTouchEvent(e);
+    }
+
+    private void onPointerUp(MotionEvent e) {
+        final int actionIndex = MotionEventCompat.getActionIndex(e);
+        if (e.getPointerId(actionIndex) == mScrollPointerId) {
+            // Pick a new pointer to pick up the slack.
+            final int newIndex = actionIndex == 0 ? 1 : 0;
+            mScrollPointerId = e.getPointerId(newIndex);
+            mInitialTouchX = mLastTouchX = (int) (e.getX(newIndex) + 0.5f);
+            mInitialTouchY = mLastTouchY = (int) (e.getY(newIndex) + 0.5f);
+        }
     }
 
 
