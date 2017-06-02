@@ -50,6 +50,7 @@ public class BarHeaderBehavior extends CoordinatorLayout.Behavior<View> {
     private void offsetChildAsNeeded(CoordinatorLayout parent, View child, View dependency) {
         int dependencyOffsetRange = getBarOffsetRange(dependency);
         int childOffsetRange = getTitleOffsetRange(dependency);
+        int childOffsetRange2 = 0;
         if (!isClosed(dependency)) {
             float childTransY = dependency.getTranslationY() == 0 ? 0 :
                     dependency.getTranslationY() == dependencyOffsetRange ? childOffsetRange :
@@ -63,9 +64,13 @@ public class BarHeaderBehavior extends CoordinatorLayout.Behavior<View> {
             child.setTranslationY(childTransY);
         } else {
             float delta = dependency.getTranslationY() - dependencyOffsetRange;
-            float childTransY = child.getTranslationY() + delta;
+            float childTransY = childOffsetRange + delta;
             Logger.d(TAG, "offsetChildAsNeeded(isClosed)-> dependency.getTranslationY()=%s, child.getTranslationY()=%s, dependencyOffsetRange=%s, childOffsetRange=%s, childTransY=%s, delta=%s",
                     dependency.getTranslationY(), child.getTranslationY(), dependencyOffsetRange, childOffsetRange, childTransY, delta);
+            if (childTransY < childOffsetRange2) {
+                childTransY = childOffsetRange2;
+            }
+            Logger.d(TAG, "offsetChildAsNeeded-> real childTransY=%s", childTransY);
             child.setTranslationY(childTransY);
 
         }

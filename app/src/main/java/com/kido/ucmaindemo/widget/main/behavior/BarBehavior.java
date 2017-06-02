@@ -71,7 +71,7 @@ public class BarBehavior extends ViewOffsetBehavior {
     public boolean onStartNestedScroll(CoordinatorLayout coordinatorLayout, View child, View directTargetChild, View target, int nestedScrollAxes) {
 
         ensureScroller(child.getContext());
-        boolean onStartNestedScroll  = (nestedScrollAxes & ViewCompat.SCROLL_AXIS_VERTICAL) != 0 && canScroll(child, 0) /*&& !isClosed(child)*/;
+        boolean onStartNestedScroll = (nestedScrollAxes & ViewCompat.SCROLL_AXIS_VERTICAL) != 0 && canScroll(child, 0) && !isTopOut(child);
         Logger.d(TAG, "onStartNestedScroll: nestedScrollAxes=%s, onStartNestedScroll=%s", nestedScrollAxes, onStartNestedScroll);
         return onStartNestedScroll;
     }
@@ -82,8 +82,10 @@ public class BarBehavior extends ViewOffsetBehavior {
         // consumed the flinging behavior until Closed
         Logger.d(TAG, "onNestedPreFling: velocityX=%s, velocityY=%s", velocityX, velocityY);
         boolean consumed = !isClosed(child);
-        mWasNestedFlung = true;
-        closePager();
+        if (consumed && !isClosed()) {
+            mWasNestedFlung = true;
+            closePager();
+        }
         return consumed;
     }
 
@@ -100,8 +102,13 @@ public class BarBehavior extends ViewOffsetBehavior {
 //    }
 
     private boolean isClosed(View child) {
-        boolean isClosed = child.getTranslationY() <= getBarOffsetRange(child);
+        boolean isClosed = child.getTranslationY() == getBarOffsetRange(child);
         return isClosed;
+    }
+
+    private boolean isTopOut(View child) {
+        boolean isTopOut = child.getTranslationY() == getBarOffsetRange(child) + -getHeaderHeight(child);
+        return isTopOut;
     }
 
     public boolean isClosed() {
@@ -151,10 +158,11 @@ public class BarBehavior extends ViewOffsetBehavior {
     public void onNestedPreScroll(CoordinatorLayout coordinatorLayout, View child, View target, int dx, int dy, int[] consumed) {
         super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed);
         //dy>0 scroll up;dy<0,scroll down
-        float dealDis = dy * DRAG_RATE; // 处理过的dis，为了不那么敏感
+        float dealDis = isClosed() ? dy : dy * DRAG_RATE; // 处理过的dis，为了不那么敏感
+        float finalOffsetRang = isClosed() ? getBarOffsetRange(child) + -getHeaderHeight(child) : getBarOffsetRange(child);
         Logger.d(TAG, "onNestedPreScroll-> dy=%s, dealDis=%s", dy, dealDis);
         if (!canScroll(child, dealDis)) {
-            child.setTranslationY(dealDis > 0 ? getBarOffsetRange(child) : 0);
+            child.setTranslationY(dealDis > 0 ? finalOffsetRang : 0);
         } else {
             child.setTranslationY(child.getTranslationY() - dealDis);
         }
@@ -165,7 +173,7 @@ public class BarBehavior extends ViewOffsetBehavior {
     @Override
     public void onStopNestedScroll(CoordinatorLayout coordinatorLayout, View child, View target) {
         super.onStopNestedScroll(coordinatorLayout, child, target);
-        if(!mWasNestedFlung) {
+        if (!mWasNestedFlung) {
             if (!isClosed()) {
                 handleActionUp(coordinatorLayout, child);
             }

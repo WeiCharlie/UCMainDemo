@@ -44,6 +44,7 @@ public class BarFollowerBehavior extends HeaderScrollingViewBehavior {
     private void offsetChildAsNeeded(CoordinatorLayout parent, View child, View dependency) {
         int dependencyOffsetRange = getBarOffsetRange(dependency);
         float childOffsetRange = -getScrollRange(dependency);
+        float childOffsetRange2 = -getScrollRange(dependency) - getHeaderHeight(dependency);
 
         if (!isClosed(dependency)) {
             float childTransY = dependency.getTranslationY() == 0 ? 0 :
@@ -58,9 +59,13 @@ public class BarFollowerBehavior extends HeaderScrollingViewBehavior {
             child.setTranslationY(childTransY);
         } else {
             float delta = dependency.getTranslationY() - dependencyOffsetRange;
-            float childTransY = child.getTranslationY() + delta;
+            float childTransY = childOffsetRange + delta;
             Logger.d(TAG, "offsetChildAsNeeded(isClosed)-> dependency.getTranslationY()=%s, child.getTranslationY()=%s, dependencyOffsetRange=%s, childOffsetRange=%s, childTransY=%s, delta=%s",
                     dependency.getTranslationY(), child.getTranslationY(), dependencyOffsetRange, childOffsetRange, childTransY, delta);
+            if (Math.abs(childTransY) > Math.abs(childOffsetRange2)) {
+                childTransY = childOffsetRange2;
+            }
+            Logger.d(TAG, "offsetChildAsNeeded-> real childTransY=%s", childTransY);
             child.setTranslationY(childTransY);
         }
     }

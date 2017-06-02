@@ -50,9 +50,10 @@ public class BarFooterBehavior extends HeaderScrollingViewBehavior {
     }
 
     private void offsetChildAsNeeded(CoordinatorLayout parent, View child, View dependency) {
-        float childOffsetRange = dependency.getTop() + getFinalTopHeight(dependency) - child.getTop();
-//             float childOffsetRange = -(dependency.getMeasuredHeight() - getFinalTopHeight(dependency));
         int dependencyOffsetRange = getBarOffsetRange(dependency);
+        float childOffsetRange = dependency.getTop() + getFinalTopHeight(dependency) - child.getTop();
+        float childOffsetRange2 = childOffsetRange - getHeaderHeight(dependency);
+//             float childOffsetRange = -(dependency.getMeasuredHeight() - getFinalTopHeight(dependency));
         if (!isClosed(dependency)) {
             float childTransY = dependency.getTranslationY() == 0 ? 0 :
                     dependency.getTranslationY() == dependencyOffsetRange ? childOffsetRange :
@@ -66,9 +67,13 @@ public class BarFooterBehavior extends HeaderScrollingViewBehavior {
             child.setTranslationY(childTransY);
         } else {
             float delta = dependency.getTranslationY() - dependencyOffsetRange;
-            float childTransY = child.getTranslationY() + delta;
+            float childTransY = childOffsetRange + delta;
             Logger.d(TAG, "offsetChildAsNeeded(isClosed)-> dependency.getTranslationY()=%s, child.getTranslationY()=%s, dependencyOffsetRange=%s, childOffsetRange=%s, childTransY=%s, delta=%s",
                     dependency.getTranslationY(), child.getTranslationY(), dependencyOffsetRange, childOffsetRange, childTransY, delta);
+            if (Math.abs(childTransY) > Math.abs(childOffsetRange2)) {
+                childTransY = childOffsetRange2;
+            }
+            Logger.d(TAG, "offsetChildAsNeeded-> real childTransY=%s", childTransY);
             child.setTranslationY(childTransY);
         }
 
@@ -95,6 +100,14 @@ public class BarFooterBehavior extends HeaderScrollingViewBehavior {
     private int getFinalTopHeight(View dependency) {
         if (dependency instanceof UcNewsBarLayout) {
             return ((UcNewsBarLayout) dependency).getHeaderHeight();
+        }
+        return 0;
+    }
+
+    private int getHeaderHeight(View dependency) {
+        if (dependency instanceof UcNewsBarLayout) {
+            UcNewsBarLayout barLayout = ((UcNewsBarLayout) dependency);
+            return barLayout.getHeaderHeight();
         }
         return 0;
     }
