@@ -97,40 +97,6 @@ public class BarBehavior extends ViewOffsetBehavior {
 //        return flung;
 //    }
 
-    private boolean isClosed(View child) {
-        boolean isClosed = child.getTranslationY() <= getBarOffsetRange(child);
-        return isClosed;
-    }
-
-    public boolean isClosed() {
-        return mCurState == STATE_CLOSED;
-    }
-
-
-    private void changeState(int newState) {
-        Logger.d(TAG, "changeState-> newState=%s", newState);
-        if (mCurState != newState) {
-            mCurState = newState;
-            if (mCurState == STATE_OPENED) {
-                if (mPagerStateListener != null) {
-                    mPagerStateListener.onBarOpened();
-                }
-            } else {
-                if (mPagerStateListener != null) {
-                    mPagerStateListener.onBarClosed();
-                }
-            }
-        }
-
-    }
-
-    private boolean canScroll(View child, float pendingDy) {
-        int pendingTranslationY = (int) (child.getTranslationY() - pendingDy);
-        if (pendingTranslationY >= getBarOffsetRange(child) && pendingTranslationY <= 0) {
-            return true;
-        }
-        return false;
-    }
 
 //    @Override
 //    public boolean onInterceptTouchEvent(CoordinatorLayout parent, final View child, MotionEvent ev) {
@@ -160,7 +126,7 @@ public class BarBehavior extends ViewOffsetBehavior {
     @Override
     public void onStopNestedScroll(CoordinatorLayout coordinatorLayout, View child, View target) {
         super.onStopNestedScroll(coordinatorLayout, child, target);
-        if(!mWasNestedFlung) {
+        if (!mWasNestedFlung) {
             if (!isClosed()) {
                 handleActionUp(coordinatorLayout, child);
             }
@@ -175,6 +141,38 @@ public class BarBehavior extends ViewOffsetBehavior {
         return 0;
     }
 
+    private boolean isClosed(View child) {
+        boolean isClosed = child.getTranslationY() <= getBarOffsetRange(child);
+        return isClosed;
+    }
+
+    public boolean isClosed() {
+        return mCurState == STATE_CLOSED;
+    }
+
+    private void changeState(int newState) {
+        Logger.d(TAG, "changeState-> newState=%s", newState);
+        if (mCurState != newState) {
+            mCurState = newState;
+            if (mCurState == STATE_OPENED) {
+                if (mPagerStateListener != null) {
+                    mPagerStateListener.onBarOpened();
+                }
+            } else {
+                if (mPagerStateListener != null) {
+                    mPagerStateListener.onBarClosed();
+                }
+            }
+        }
+    }
+
+    private boolean canScroll(View child, float pendingDy) {
+        int pendingTranslationY = (int) (child.getTranslationY() - pendingDy);
+        if (pendingTranslationY >= getBarOffsetRange(child) && pendingTranslationY <= 0) {
+            return true;
+        }
+        return false;
+    }
 
     private void handleActionUp(CoordinatorLayout parent, final View child) {
         boolean isClosed = isClosed(child);
