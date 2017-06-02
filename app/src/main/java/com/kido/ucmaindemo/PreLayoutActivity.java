@@ -51,6 +51,14 @@ public class PreLayoutActivity extends AppCompatActivity {
         mContentPager = (UcNewsContentPager) findViewById(R.id.news_viewPager);
         mTabLayout = (UcNewsTabLayout) findViewById(R.id.news_tabLayout);
         bottomBar = (ImageView) findViewById(R.id.bottom_bar);
+        bottomBar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mBarLayout.isClosed()) {
+                    mBarLayout.openBar();
+                }
+            }
+        });
 
     }
 
