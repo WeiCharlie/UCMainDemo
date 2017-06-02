@@ -115,9 +115,9 @@ public class BarBehavior extends ViewOffsetBehavior {
         float dealDis = dy * DRAG_RATE; // 处理过的dis，为了不那么敏感
         Logger.d(TAG, "onNestedPreScroll-> dy=%s, dealDis=%s", dy, dealDis);
         if (!canScroll(child, dealDis)) {
-            child.setTranslationY(dealDis > 0 ? getBarOffsetRange(child) : 0);
+            ViewCompat.setTranslationY(child, dealDis > 0 ? getBarOffsetRange(child) : 0);
         } else {
-            child.setTranslationY(child.getTranslationY() - dealDis);
+            ViewCompat.setTranslationY(child, child.getTranslationY() - dealDis);
         }
         //consumed all scroll behavior after we started Nested Scrolling
         consumed[1] = dy;

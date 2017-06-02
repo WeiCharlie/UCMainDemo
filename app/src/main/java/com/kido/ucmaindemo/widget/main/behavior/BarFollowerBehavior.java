@@ -3,6 +3,7 @@ package com.kido.ucmaindemo.widget.main.behavior;
 
 import android.content.Context;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -54,7 +55,7 @@ public class BarFollowerBehavior extends HeaderScrollingViewBehavior {
             childTransY = childOffsetRange;
         }
         Logger.d(TAG, "offsetChildAsNeeded-> real childTransY=%s", childTransY);
-        child.setTranslationY(childTransY);
+        ViewCompat.setTranslationY(child, childTransY);
     }
 
 
