@@ -50,7 +50,7 @@ public class BarFooterBehavior extends HeaderScrollingViewBehavior {
     }
 
     private void offsetChildAsNeeded(CoordinatorLayout parent, View child, View dependency) {
-        float childOffsetRange = dependency.getTop() + getFinalTopHeight(dependency) - child.getTop();
+        float childOffsetRange = -getScrollRange(dependency);
 //             float childOffsetRange = -(dependency.getMeasuredHeight() - getFinalTopHeight(dependency));
         int dependencyOffsetRange = getBarOffsetRange(dependency);
 
@@ -77,6 +77,15 @@ public class BarFooterBehavior extends HeaderScrollingViewBehavior {
                 return view;
         }
         return null;
+    }
+
+    @Override
+    protected int getScrollRange(View v) {
+        if (isDependOn(v)) {
+            return Math.max(0, v.getMeasuredHeight() - getFinalTopHeight(v));
+        } else {
+            return super.getScrollRange(v);
+        }
     }
 
     private int getBarOffsetRange(View dependency) {
