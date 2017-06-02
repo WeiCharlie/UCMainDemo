@@ -5,15 +5,15 @@
     android:orientation="vertical">
 
     <Button
-        android:id="@+id/ucNewsBar_button"
+        android:id="@+id/addView_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/activity_UcNewsBarLayout" />
+        android:text="@string/addView_UcNews" />
 
     <Button
-        android:id="@+id/onlyUcNews_button"
+        android:id="@+id/preLayout_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/activity_OnlyUcNews" />
+        android:text="@string/preLayout_UcNews" />
 
 </LinearLayout>

@@ -1,4 +1,4 @@
-package com.kido.ucmaindemo;
+package com.kido.ucmaindemo.widget;
 
 import android.content.Context;
 import android.support.annotation.AttrRes;
@@ -10,7 +10,10 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 
+import com.kido.ucmaindemo.NewsTagFragment;
+import com.kido.ucmaindemo.R;
 import com.kido.ucmaindemo.adapter.TagFragmentAdapter;
 import com.kido.ucmaindemo.widget.main.UcNewsContentPager;
 import com.kido.ucmaindemo.widget.main.UcNewsTabLayout;
@@ -29,6 +32,7 @@ public class OnlyUcNewsLayout extends FrameLayout {
     private UcNewsTitleLayout mTitleLayout;
     private UcNewsTabLayout mTabLayout;
     private UcNewsContentPager mContentPager;
+    private ImageView mBottomBar;
 
     private List<NewsTagFragment> mFragments;
 
@@ -75,6 +79,15 @@ public class OnlyUcNewsLayout extends FrameLayout {
         mTitleLayout = (UcNewsTitleLayout) findViewById(R.id.titlebar_layout);
         mContentPager = (UcNewsContentPager) findViewById(R.id.news_viewPager);
         mTabLayout = (UcNewsTabLayout) findViewById(R.id.news_tabLayout);
+        mBottomBar = (ImageView) findViewById(R.id.bottom_bar);
+        mBottomBar.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mOnGobackListener != null) {
+                    mOnGobackListener.onGoback();
+                }
+            }
+        });
 
     }
 

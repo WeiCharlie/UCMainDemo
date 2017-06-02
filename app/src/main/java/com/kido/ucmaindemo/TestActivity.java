@@ -23,8 +23,8 @@ public class TestActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void bindViews() {
-        mUcNewsBarButton = (Button) findViewById(R.id.ucNewsBar_button);
-        mOnlyUcNewsButton = (Button) findViewById(R.id.onlyUcNews_button);
+        mUcNewsBarButton = (Button) findViewById(R.id.addView_button);
+        mOnlyUcNewsButton = (Button) findViewById(R.id.preLayout_button);
 
         mUcNewsBarButton.setOnClickListener(this);
         mOnlyUcNewsButton.setOnClickListener(this);
@@ -33,11 +33,11 @@ public class TestActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.ucNewsBar_button:
-                startActivity(new Intent(this, MainActivity.class));
+            case R.id.addView_button:
+                startActivity(new Intent(this, AddViewActivity.class));
                 break;
-            case R.id.onlyUcNews_button:
-                startActivity(new Intent(this, OnlyUcNewsActivity.class));
+            case R.id.preLayout_button:
+                startActivity(new Intent(this, PreLayoutActivity.class));
                 break;
         }
     }

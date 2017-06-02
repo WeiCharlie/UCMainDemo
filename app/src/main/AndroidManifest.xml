@@ -22,10 +22,10 @@
         </activity>
 
         <activity
-            android:name=".OnlyUcNewsActivity"
+            android:name=".PreLayoutActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".MainActivity"
+            android:name=".AddViewActivity"
             android:screenOrientation="portrait" />
     </application>
 

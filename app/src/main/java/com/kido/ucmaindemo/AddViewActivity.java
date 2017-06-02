@@ -9,6 +9,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.kido.ucmaindemo.adapter.TagFragmentAdapter;
+import com.kido.ucmaindemo.widget.OnlyUcNewsLayout;
 import com.kido.ucmaindemo.widget.main.UcNewsBarLayout;
 import com.kido.ucmaindemo.widget.main.UcNewsContentPager;
 import com.kido.ucmaindemo.widget.main.UcNewsTabLayout;
@@ -24,7 +25,7 @@ import java.util.List;
  * @author Kido
  */
 
-public class MainActivity extends AppCompatActivity {
+public class AddViewActivity extends AppCompatActivity {
 
     private FrameLayout mRootContainer;
     private OnlyUcNewsLayout mOnlyUcNewsLayout;
@@ -42,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_addview);
         bindViews();
         initTitleAndHeader();
         initTabsAndPager();
@@ -107,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
             if (mOnlyUcNewsLayout != null) {
                 mRootContainer.removeView(mOnlyUcNewsLayout);
             }
-            mOnlyUcNewsLayout = new OnlyUcNewsLayout(MainActivity.this);
+            mOnlyUcNewsLayout = new OnlyUcNewsLayout(AddViewActivity.this);
             mOnlyUcNewsLayout.setOnGobackListener(new OnlyUcNewsLayout.OnGobackListener() {
                 @Override
                 public void onGoback() {
