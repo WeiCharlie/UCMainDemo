@@ -72,18 +72,17 @@ public class AddViewActivity extends AppCompatActivity {
         mBarLayout.setBarStateListener(new UcNewsBarLayout.OnBarStateListener() {
             @Override
             public void onBarStartClosing() {
-                mContentPager.setPagingEnabled(true);
-                mFragments.get(0).setRefreshEnable(true);
-                mRefreshLayout.setEnabled(false);
+                mFragments.get(0).setLayoutFrozen(true);
             }
 
             @Override
             public void onBarStartOpening() {
                 mContentPager.setCurrentItem(0, false);
                 mContentPager.setPagingEnabled(false);
+                mRefreshLayout.setEnabled(true);
                 mFragments.get(0).scrollToTop();
                 mFragments.get(0).setRefreshEnable(false);
-                mRefreshLayout.setEnabled(true);
+                mFragments.get(0).setLayoutFrozen(false);
             }
 
             @Override
@@ -91,6 +90,10 @@ public class AddViewActivity extends AppCompatActivity {
 //                bottomBar.setImageResource(R.drawable.bottom_bar_toutiao);
 //                mOnlyUcNewsLayout.setVisibility(View.VISIBLE); // 模拟动态添加View
                 gotoUcNews();
+                mContentPager.setPagingEnabled(true);
+                mRefreshLayout.setEnabled(false);
+                mFragments.get(0).setRefreshEnable(true);
+                mFragments.get(0).setLayoutFrozen(false);
             }
 
             @Override

@@ -85,9 +85,16 @@ public class NewsTagFragment extends Fragment {
         return mListView;
     }
 
+
     public void setRefreshEnable(boolean refreshEnable) {
         if (mRefreshLayout != null) {
             mRefreshLayout.setEnabled(refreshEnable);
+        }
+    }
+
+    public void setLayoutFrozen(boolean frozen) {
+        if (mListView != null) {
+            mListView.setLayoutFrozen(frozen);
         }
     }
 
