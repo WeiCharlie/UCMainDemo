@@ -4,9 +4,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.NestedScrollView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.kido.ucmaindemo.adapter.ListViewAdapter;
@@ -23,12 +25,15 @@ import java.util.List;
 public class NewsTagFragment extends Fragment {
     private static final String KEY_TITLE = "title";
 
+    private NestedScrollView mNestedScrollView;
     private ListView mListView;
     private KSwipeRefreshLayout mRefreshLayout;
 
     private String mTitle = "";
     private List<KSwipeRefreshLayout.OnRefreshListener> mOnRefreshListeners = new ArrayList<>();
 
+    final ArrayList<String> dataList = new ArrayList<>();
+    ListViewAdapter adapter;
 
     public static NewsTagFragment newInstance() {
         return newInstance("");
@@ -54,6 +59,7 @@ public class NewsTagFragment extends Fragment {
 
     private void initView(View rootView) {
         mTitle = getArguments().getString(KEY_TITLE);
+        mNestedScrollView = (NestedScrollView) rootView.findViewById(R.id.nested_scrollView);
         mListView = (ListView) rootView.findViewById(R.id.recyclerView);
         mRefreshLayout = (KSwipeRefreshLayout) rootView.findViewById(R.id.refresh_layout);
 //        mListView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
@@ -91,8 +97,8 @@ public class NewsTagFragment extends Fragment {
     }
 
     public void scrollToTop() {
-        if (mListView != null) {
-            mListView.setSelection(0);
+        if (mNestedScrollView != null) {
+            mNestedScrollView.scrollTo(0, 0);
         }
     }
 
@@ -117,7 +123,7 @@ public class NewsTagFragment extends Fragment {
     }
 
     private void initData() {
-        final ArrayList<String> dataList = new ArrayList<>();
+
         for (int i = 0; i < 40; i++) {
             dataList.add("This is the title. (" + mTitle + i + ")");
         }
@@ -128,7 +134,24 @@ public class NewsTagFragment extends Fragment {
 //                Toast.makeText(getContext(), dataList.get(position), Toast.LENGTH_LONG).show();
 //            }
 //        });
-        mListView.setAdapter(new ListViewAdapter(getContext(), dataList));
+        adapter = new ListViewAdapter(getContext(), dataList);
+        mListView.setAdapter(adapter);
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                addData();
+            }
+        });
+
+    }
+
+    public void addData() {
+
+        for (int i = 0; i < 5; i++) {
+            dataList.add("This is the title. (" + mTitle + i + ")");
+        }
+
+        adapter.notifyDataSetChanged();
 
     }
 
