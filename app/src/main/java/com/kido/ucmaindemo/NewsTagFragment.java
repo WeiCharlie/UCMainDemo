@@ -30,6 +30,8 @@ public class NewsTagFragment extends Fragment {
     private String mTitle = "";
     private List<KSwipeRefreshLayout.OnRefreshListener> mOnRefreshListeners = new ArrayList<>();
 
+    final ArrayList<String> dataList = new ArrayList<>();
+
 
     public static NewsTagFragment newInstance() {
         return newInstance("");
@@ -126,7 +128,7 @@ public class NewsTagFragment extends Fragment {
     }
 
     private void initData() {
-        final ArrayList<String> dataList = new ArrayList<>();
+
         for (int i = 0; i < 40; i++) {
             dataList.add("This is the title. (" + mTitle + i + ")");
         }
@@ -135,12 +137,21 @@ public class NewsTagFragment extends Fragment {
             @Override
             public void onItemClick(View view, int position) {
 //                Toast.makeText(getContext(), dataList.get(position), Toast.LENGTH_LONG).show();
+                addData();
             }
         });
         mListView.setAdapter(adapter);
 
 //        mListView.setAdapter(new ListViewAdapter(getContext(), dataList));
 
+    }
+
+    public void addData() {
+        int size = dataList.size();
+        for (int i = size; i < size + 5; i++) {
+            dataList.add("This is the title. (" + mTitle + i + ")");
+        }
+        mListView.getAdapter().notifyDataSetChanged();
     }
 
 }
