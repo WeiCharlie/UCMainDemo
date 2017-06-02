@@ -50,17 +50,25 @@ public class BarHeaderBehavior extends CoordinatorLayout.Behavior<View> {
     private void offsetChildAsNeeded(CoordinatorLayout parent, View child, View dependency) {
         int dependencyOffsetRange = getBarOffsetRange(dependency);
         int childOffsetRange = getTitleOffsetRange(dependency);
+        if (!isClosed(dependency)) {
+            float childTransY = dependency.getTranslationY() == 0 ? 0 :
+                    dependency.getTranslationY() == dependencyOffsetRange ? childOffsetRange :
+                            ((float) Math.floor(dependency.getTranslationY()) / (dependencyOffsetRange * 1.0f) * childOffsetRange);
+            Logger.d(TAG, "offsetChildAsNeeded(!isClosed)-> dependency.getTranslationY()=%s, dependencyOffsetRange=%s, childOffsetRange=%s, childTransY=%s",
+                    dependency.getTranslationY(), dependencyOffsetRange, childOffsetRange, childTransY);
+            if (Math.abs(childTransY) > Math.abs(childOffsetRange)) {
+                childTransY = childOffsetRange;
+            }
+            Logger.d(TAG, "offsetChildAsNeeded-> real childTransY=%s", childTransY);
+            child.setTranslationY(childTransY);
+        } else {
+            float delta = dependency.getTranslationY() - dependencyOffsetRange;
+            float childTransY = child.getTranslationY() + delta;
+            Logger.d(TAG, "offsetChildAsNeeded(isClosed)-> dependency.getTranslationY()=%s, child.getTranslationY()=%s, dependencyOffsetRange=%s, childOffsetRange=%s, childTransY=%s, delta=%s",
+                    dependency.getTranslationY(), child.getTranslationY(), dependencyOffsetRange, childOffsetRange, childTransY, delta);
+            child.setTranslationY(childTransY);
 
-        float childTransY = dependency.getTranslationY() == 0 ? 0 :
-                dependency.getTranslationY() == dependencyOffsetRange ? childOffsetRange :
-                        ((float) Math.floor(dependency.getTranslationY()) / (dependencyOffsetRange * 1.0f) * childOffsetRange);
-        Logger.d(TAG, "offsetChildAsNeeded-> dependency.getTranslationY()=%s, dependencyOffsetRange=%s, childOffsetRange=%s, childTransY=%s",
-                dependency.getTranslationY(), dependencyOffsetRange, childOffsetRange, childTransY);
-        if (Math.abs(childTransY) > Math.abs(childOffsetRange)) {
-            childTransY = childOffsetRange;
         }
-        Logger.d(TAG, "offsetChildAsNeeded-> real childTransY=%s", childTransY);
-        child.setTranslationY(childTransY);
 
     }
 
@@ -73,9 +81,18 @@ public class BarHeaderBehavior extends CoordinatorLayout.Behavior<View> {
 
     private int getTitleOffsetRange(View dependency) {
         if (dependency instanceof UcNewsBarLayout) {
-            return ((UcNewsBarLayout) dependency).getHeaderHeight();
+            UcNewsBarLayout barLayout = ((UcNewsBarLayout) dependency);
+            return barLayout.getHeaderHeight();
         }
         return 0;
+    }
+
+    private boolean isClosed(View dependency) {
+        if (dependency instanceof UcNewsBarLayout) {
+            UcNewsBarLayout barLayout = ((UcNewsBarLayout) dependency);
+            return barLayout.isClosed();
+        }
+        return false;
     }
 
 

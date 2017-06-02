@@ -69,9 +69,11 @@ public class BarBehavior extends ViewOffsetBehavior {
 
     @Override
     public boolean onStartNestedScroll(CoordinatorLayout coordinatorLayout, View child, View directTargetChild, View target, int nestedScrollAxes) {
-        Logger.d(TAG, "onStartNestedScroll: nestedScrollAxes=%s", nestedScrollAxes);
+
         ensureScroller(child.getContext());
-        return (nestedScrollAxes & ViewCompat.SCROLL_AXIS_VERTICAL) != 0 && canScroll(child, 0) && !isClosed(child);
+        boolean onStartNestedScroll  = (nestedScrollAxes & ViewCompat.SCROLL_AXIS_VERTICAL) != 0 && canScroll(child, 0) /*&& !isClosed(child)*/;
+        Logger.d(TAG, "onStartNestedScroll: nestedScrollAxes=%s, onStartNestedScroll=%s", nestedScrollAxes, onStartNestedScroll);
+        return onStartNestedScroll;
     }
 
 
@@ -126,10 +128,13 @@ public class BarBehavior extends ViewOffsetBehavior {
 
     private boolean canScroll(View child, float pendingDy) {
         int pendingTranslationY = (int) (child.getTranslationY() - pendingDy);
-        if (pendingTranslationY >= getBarOffsetRange(child) && pendingTranslationY <= 0) {
-            return true;
+        boolean canScroll = false;
+        if (isClosed()) {
+            canScroll = pendingTranslationY <= getBarOffsetRange(child) && pendingTranslationY >= getBarOffsetRange(child) - getHeaderHeight(child);
+        } else {
+            canScroll = pendingTranslationY >= getBarOffsetRange(child) && pendingTranslationY <= 0;
         }
-        return false;
+        return canScroll;
     }
 
 //    @Override
@@ -170,7 +175,16 @@ public class BarBehavior extends ViewOffsetBehavior {
 
     private int getBarOffsetRange(View child) {
         if (child instanceof UcNewsBarLayout) {
-            return ((UcNewsBarLayout) child).getBarOffsetRange();
+            UcNewsBarLayout barLayout = (UcNewsBarLayout) child;
+            return barLayout.getBarOffsetRange();
+        }
+        return 0;
+    }
+
+    private int getHeaderHeight(View child) {
+        if (child instanceof UcNewsBarLayout) {
+            UcNewsBarLayout barLayout = (UcNewsBarLayout) child;
+            return barLayout.getHeaderHeight();
         }
         return 0;
     }

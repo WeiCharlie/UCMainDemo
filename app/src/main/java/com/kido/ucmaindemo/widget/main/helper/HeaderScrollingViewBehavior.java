@@ -60,7 +60,7 @@ public abstract class HeaderScrollingViewBehavior extends ViewOffsetBehavior<Vie
                         availableHeight = parent.getHeight();
                     }
 
-                    final int height = availableHeight - header.getMeasuredHeight() + getScrollRange(header);
+                    final int height = availableHeight - header.getMeasuredHeight() + getScrollRange(header) + getExtraRange(header);
                     final int heightMeasureSpec = View.MeasureSpec.makeMeasureSpec(height,
                             childLpHeight == ViewGroup.LayoutParams.MATCH_PARENT ? View.MeasureSpec.EXACTLY : View.MeasureSpec.AT_MOST);
 
@@ -119,6 +119,10 @@ public abstract class HeaderScrollingViewBehavior extends ViewOffsetBehavior<Vie
     protected abstract View findFirstDependency(List<View> views);
 
     protected int getScrollRange(View v) {
+        return v.getMeasuredHeight();
+    }
+
+    protected int getExtraRange(View v) {
         return v.getMeasuredHeight();
     }
 
