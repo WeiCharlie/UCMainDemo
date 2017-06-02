@@ -99,6 +99,7 @@ public class NewsTagFragment extends Fragment {
     public void scrollToTop() {
         if (mNestedScrollView != null) {
             mNestedScrollView.scrollTo(0, 0);
+            mListView.setSelection(0);
         }
     }
 
