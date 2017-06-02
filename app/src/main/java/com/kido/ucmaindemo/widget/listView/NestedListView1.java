@@ -128,6 +128,8 @@ public class NestedListView1 extends ListView implements NestedScrollingChild {
 
             case MotionEvent.ACTION_CANCEL: {
 //                cancelTouch();
+                stopNestedScroll();
+                isFirst = true;
             }
             break;
         }
