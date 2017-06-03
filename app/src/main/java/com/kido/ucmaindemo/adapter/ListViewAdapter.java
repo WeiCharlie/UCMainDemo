@@ -8,6 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.kido.ucmaindemo.R;
+import com.kido.ucmaindemo.utils.Logger;
 
 import java.util.List;
 
@@ -46,16 +47,19 @@ public class ListViewAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
+        boolean preNull = true;
         if (convertView == null) {
+            preNull = true;
             convertView = mInflater.inflate(R.layout.item_news, null);
             holder = new ViewHolder(convertView);
             convertView.setTag(holder);
         } else {
+            preNull = false;
             holder = (ViewHolder) convertView.getTag();
         }
 
         holder.title.setText(mItems.get(position));
-
+        Logger.e("kido", "getView convertView-> position=%s, hash=%s, preNull=%s", position, convertView.hashCode(), preNull);
         return convertView;
     }
 

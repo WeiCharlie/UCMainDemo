@@ -10,8 +10,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.kido.ucmaindemo.adapter.ListViewAdapter;
+import com.kido.ucmaindemo.utils.Logger;
 import com.kido.ucmaindemo.widget.refresh.KSwipeRefreshLayout;
 
 import java.util.ArrayList;
@@ -140,18 +142,22 @@ public class NewsTagFragment extends Fragment {
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                addData();
+                if (position % 2 == 0) {
+                    addData();
+                } else {
+                    Logger.e("kido", "mListView.getMeasureHeight->" + mListView.getMeasuredHeight());
+                }
             }
         });
 
     }
 
     public void addData() {
-
-        for (int i = 0; i < 5; i++) {
+        int size = dataList.size();
+        for (int i = size; i < size + 5; i++) {
             dataList.add("This is the title. (" + mTitle + i + ")");
         }
-
+        Toast.makeText(getContext(), "You added 5 data.", Toast.LENGTH_SHORT).show();
         adapter.notifyDataSetChanged();
 
     }
