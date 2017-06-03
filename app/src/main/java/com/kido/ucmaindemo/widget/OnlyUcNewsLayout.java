@@ -70,7 +70,9 @@ public class OnlyUcNewsLayout extends FrameLayout {
     }
 
     private void initData() {
-
+//        for (NewsTagFragment fragment : mFragments) {
+//            fragment.setOpeningState(false);
+//        }
     }
 
 
@@ -95,7 +97,7 @@ public class OnlyUcNewsLayout extends FrameLayout {
         mTitleLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mFragments.get(mContentPager.getCurrentItem()).getRecyclerView().smoothScrollToPosition(0);
+                mFragments.get(mContentPager.getCurrentItem()).scrollToTop(true);
             }
         });
     }
@@ -106,7 +108,7 @@ public class OnlyUcNewsLayout extends FrameLayout {
         mFragments = new ArrayList<>(newsTabTitles.length);
         for (String title : newsTabTitles) {
             mTabLayout.addTab(mTabLayout.newTab().setText(title));
-            NewsTagFragment fragment = NewsTagFragment.newInstance(title);
+            NewsTagFragment fragment = NewsTagFragment.newInstance(title, false);
             fragment.addOnRefreshListener(new KSwipeRefreshLayout.OnRefreshListener() {
                 @Override
                 public void onRefresh() {

@@ -9,11 +9,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.kido.ucmaindemo.adapter.ListViewAdapter;
 import com.kido.ucmaindemo.utils.Logger;
+import com.kido.ucmaindemo.widget.listView.NestedListView5;
 import com.kido.ucmaindemo.widget.refresh.KSwipeRefreshLayout;
 
 import java.util.ArrayList;
@@ -26,12 +26,14 @@ import java.util.List;
  */
 public class NewsTagFragment extends Fragment {
     private static final String KEY_TITLE = "title";
+    private static final String KEY_OPENING = "opening";
 
     private NestedScrollView mNestedScrollView;
-    private ListView mListView;
+    private NestedListView5 mListView;
     private KSwipeRefreshLayout mRefreshLayout;
 
     private String mTitle = "";
+    private boolean mIsOpeningState;
     private List<KSwipeRefreshLayout.OnRefreshListener> mOnRefreshListeners = new ArrayList<>();
 
     final ArrayList<String> dataList = new ArrayList<>();
@@ -42,8 +44,13 @@ public class NewsTagFragment extends Fragment {
     }
 
     public static NewsTagFragment newInstance(String title) {
+        return newInstance(title, true);
+    }
+
+    public static NewsTagFragment newInstance(String title, boolean isOpeningState) {
         Bundle args = new Bundle();
         args.putString(KEY_TITLE, title);
+        args.putBoolean(KEY_OPENING, isOpeningState);
         NewsTagFragment fragment = new NewsTagFragment();
         fragment.setArguments(args);
         return fragment;
@@ -61,8 +68,9 @@ public class NewsTagFragment extends Fragment {
 
     private void initView(View rootView) {
         mTitle = getArguments().getString(KEY_TITLE);
-        mNestedScrollView = (NestedScrollView) rootView.findViewById(R.id.nested_scrollView);
-        mListView = (ListView) rootView.findViewById(R.id.recyclerView);
+        mIsOpeningState = getArguments().getBoolean(KEY_OPENING);
+//        mNestedScrollView = (NestedScrollView) rootView.findViewById(R.id.nested_scrollView);
+        mListView = (NestedListView5) rootView.findViewById(R.id.recyclerView);
         mRefreshLayout = (KSwipeRefreshLayout) rootView.findViewById(R.id.refresh_layout);
 //        mListView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
         mRefreshLayout.setOnRefreshListener(new KSwipeRefreshLayout.OnRefreshListener() {
@@ -82,14 +90,25 @@ public class NewsTagFragment extends Fragment {
                 triggerOnTerminal();
             }
         });
+        setOpeningState(mIsOpeningState);
     }
 
-    public KSwipeRefreshLayout getRereshLayout() {
-        return mRefreshLayout;
+    public void setOpeningState(boolean isOpening) {
+        if (isOpening) {
+            scrollToTop(false);
+            setRefreshEnable(false);
+            setTouchScrollable(false);
+        } else {
+            scrollToTop(false);
+            setRefreshEnable(true);
+            setTouchScrollable(true);
+        }
     }
 
-    public ListView getRecyclerView() {
-        return mListView;
+    public void setTouchScrollable(boolean scrollable) {
+        if (mListView != null) {
+            mListView.setTouchScrollable(scrollable);
+        }
     }
 
     public void setRefreshEnable(boolean refreshEnable) {
@@ -98,10 +117,16 @@ public class NewsTagFragment extends Fragment {
         }
     }
 
-    public void scrollToTop() {
-        if (mNestedScrollView != null) {
-            mNestedScrollView.scrollTo(0, 0);
-            mListView.setSelection(0);
+    public void scrollToTop(boolean smooth) {
+//        if (mNestedScrollView != null) {
+//            mNestedScrollView.scrollTo(0, 0);
+//        }
+        if (mListView != null) {
+            if (smooth) {
+                mListView.smoothScrollToPosition(0);
+            } else {
+                mListView.setSelection(0);
+            }
         }
     }
 
