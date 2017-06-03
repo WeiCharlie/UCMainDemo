@@ -80,8 +80,10 @@ public class BarBehavior extends ViewOffsetBehavior {
         // consumed the flinging behavior until Closed
         Logger.d(TAG, "onNestedPreFling: velocityX=%s, velocityY=%s", velocityX, velocityY);
         boolean consumed = !isClosed(child);
-        mWasNestedFlung = true;
-        closePager();
+        if (consumed) {
+            mWasNestedFlung = true;
+            closePager();
+        }
         return consumed;
     }
 
