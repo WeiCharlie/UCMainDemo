@@ -66,13 +66,15 @@ public class AddViewActivity extends AppCompatActivity {
         mTitleLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mFragments.get(mContentPager.getCurrentItem()).getRecyclerView().smoothScrollToPosition(0);
+                mFragments.get(mContentPager.getCurrentItem()).scrollToTop(true);
             }
         });
         mBarLayout.setBarStateListener(new UcNewsBarLayout.OnBarStateListener() {
             @Override
             public void onBarStartClosing() {
-                mFragments.get(0).setLayoutFrozen(true);
+                mContentPager.setPagingEnabled(true);
+                mRefreshLayout.setEnabled(false);
+                mFragments.get(0).setOpeningState(false);
             }
 
             @Override
@@ -80,9 +82,7 @@ public class AddViewActivity extends AppCompatActivity {
                 mContentPager.setCurrentItem(0, false);
                 mContentPager.setPagingEnabled(false);
                 mRefreshLayout.setEnabled(true);
-                mFragments.get(0).scrollToTop();
-                mFragments.get(0).setRefreshEnable(false);
-                mFragments.get(0).setLayoutFrozen(false);
+                mFragments.get(0).setOpeningState(true);
             }
 
             @Override
@@ -90,10 +90,6 @@ public class AddViewActivity extends AppCompatActivity {
 //                bottomBar.setImageResource(R.drawable.bottom_bar_toutiao);
 //                mOnlyUcNewsLayout.setVisibility(View.VISIBLE); // 模拟动态添加View
                 gotoUcNews();
-                mContentPager.setPagingEnabled(true);
-                mRefreshLayout.setEnabled(false);
-                mFragments.get(0).setRefreshEnable(true);
-                mFragments.get(0).setLayoutFrozen(false);
             }
 
             @Override

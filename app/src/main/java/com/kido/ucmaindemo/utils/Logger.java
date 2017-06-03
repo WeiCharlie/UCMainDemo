@@ -18,6 +18,13 @@ public class Logger {
         }
     }
 
+    public static void i(String tag, String message, Object... args) {
+        if (IS_LOG_ENABLED) {
+            Log.i(tag, String.format(message, args));
+        }
+    }
+
+
     public static void e(String tag, String message, Object... args) {
         if (IS_LOG_ENABLED) {
             Log.e(tag, String.format(message, args));
