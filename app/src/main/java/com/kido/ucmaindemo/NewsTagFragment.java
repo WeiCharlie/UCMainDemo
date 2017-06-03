@@ -190,12 +190,4 @@ public class NewsTagFragment extends Fragment {
 
     }
 
-    public void addData() {
-        int size = dataList.size();
-        for (int i = size; i < size + 5; i++) {
-            dataList.add("This is the title. (" + mTitle + i + ")");
-        }
-        mListView.getAdapter().notifyDataSetChanged();
-    }
-
 }
