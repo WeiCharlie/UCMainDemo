@@ -13,6 +13,7 @@ import android.widget.ListView;
  * <p>
  * 通过查看AbsListView源码，发现其已对嵌套滑动做了一些处理，但是并没有实现 NestedScrollingChild 接口，不过对应调用方法与NestedScrollingChild中的保持了一致。
  * 想直接把源码拷贝出来，但关联太多了，所以此处实现该接口让其调用的时候指向这里(但是是api21的时候才加的)。
+ * <p>为了兼容api21之前达到嵌套滑动的效果，请将该NestedListView外围包多一个NestedScrollView</>
  *
  * @author Kido
  */
@@ -47,6 +48,13 @@ public class NestedListView extends ListView implements NestedScrollingChild {
         setNestedScrollingEnabled(true);
     }
 
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            heightMeasureSpec = MeasureSpec.makeMeasureSpec(Integer.MAX_VALUE >> 2, MeasureSpec.AT_MOST);
+        }
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+    }
 
     @Override
     public void setNestedScrollingEnabled(boolean enabled) {

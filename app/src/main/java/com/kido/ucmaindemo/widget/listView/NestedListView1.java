@@ -133,6 +133,7 @@ public class NestedListView1 extends ListView implements NestedScrollingChild {
             }
             break;
         }
+        vtev.recycle();
         super.onTouchEvent(e);
         return true;
     }

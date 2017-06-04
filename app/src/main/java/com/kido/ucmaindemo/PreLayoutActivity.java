@@ -66,24 +66,23 @@ public class PreLayoutActivity extends AppCompatActivity {
         mTitleLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mFragments.get(mContentPager.getCurrentItem()).getRecyclerView().smoothScrollToPosition(0);
+                mFragments.get(mContentPager.getCurrentItem()).scrollToTop(true);
             }
         });
         mBarLayout.setBarStateListener(new UcNewsBarLayout.OnBarStateListener() {
             @Override
             public void onBarStartClosing() {
                 mContentPager.setPagingEnabled(true);
-                mFragments.get(0).setRefreshEnable(true);
                 mRefreshLayout.setEnabled(false);
+                mFragments.get(0).setOpeningState(false);
             }
 
             @Override
             public void onBarStartOpening() {
                 mContentPager.setCurrentItem(0, false);
                 mContentPager.setPagingEnabled(false);
-                mFragments.get(0).scrollToTop();
-                mFragments.get(0).setRefreshEnable(false);
                 mRefreshLayout.setEnabled(true);
+                mFragments.get(0).setOpeningState(true);
             }
 
             @Override
@@ -123,6 +122,8 @@ public class PreLayoutActivity extends AppCompatActivity {
         mContentPager.setupTabLayout(mTabLayout);
         mContentPager.setAdapter(new TagFragmentAdapter(getSupportFragmentManager(), mFragments));
         mContentPager.setPagingEnabled(false);
+        mContentPager.setCurrentItem(0);
+        mFragments.get(0).setOpeningState(true);
 
     }
 

@@ -29,7 +29,7 @@ public class BarBehavior extends ViewOffsetBehavior {
 
     private static final float DRAG_RATE = 1f / 5f; // 用于消耗下拉dy
 
-    private static final float UP_DOWN_DIVIDE = 1f / 3f; // 超过该分割线的话松开是自动合拢
+    private static final float UP_DOWN_DIVIDE = 2f / 5f; // 超过该分割线的话松开是自动合拢
 
     private int mCurState = STATE_OPENED;
     private OnPagerStateListener mPagerStateListener;
@@ -117,9 +117,9 @@ public class BarBehavior extends ViewOffsetBehavior {
         float dealDis = dy * DRAG_RATE; // 处理过的dis，为了不那么敏感
         Logger.d(TAG, "onNestedPreScroll-> dy=%s, dealDis=%s", dy, dealDis);
         if (!canScroll(child, dealDis)) {
-            child.setTranslationY(dealDis > 0 ? getBarOffsetRange(child) : 0);
+            ViewCompat.setTranslationY(child, dealDis > 0 ? getBarOffsetRange(child) : 0);
         } else {
-            child.setTranslationY(child.getTranslationY() - dealDis);
+            ViewCompat.setTranslationY(child, child.getTranslationY() - dealDis);
         }
         //consumed all scroll behavior after we started Nested Scrolling
         consumed[1] = dy;
