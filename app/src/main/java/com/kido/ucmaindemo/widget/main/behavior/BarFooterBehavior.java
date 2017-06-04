@@ -3,12 +3,15 @@ package com.kido.ucmaindemo.widget.main.behavior;
 
 import android.content.Context;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.View;
 
 import com.kido.ucmaindemo.utils.Logger;
 import com.kido.ucmaindemo.widget.main.UcNewsBarLayout;
+import com.kido.ucmaindemo.widget.main.behavior.action.AbsActionHelper;
+import com.kido.ucmaindemo.widget.main.behavior.action.AbsBarOffsetAction;
+import com.kido.ucmaindemo.widget.main.behavior.action.BarFooterActionClosed;
+import com.kido.ucmaindemo.widget.main.behavior.action.BarFooterActionOpened;
 import com.kido.ucmaindemo.widget.main.helper.HeaderScrollingViewBehavior;
 
 import java.util.List;
@@ -24,13 +27,25 @@ import java.util.List;
 public class BarFooterBehavior extends HeaderScrollingViewBehavior {
     private static final String TAG = "UNBL_FooterBehavior";
 
+    private AbsBarOffsetAction mActionOpened, mActionClosed;
+
     public BarFooterBehavior() {
+        init();
     }
 
     public BarFooterBehavior(Context context, AttributeSet attrs) {
         super(context, attrs);
+        init();
     }
 
+    private void init() {
+        mActionOpened = new BarFooterActionOpened();
+        mActionClosed = new BarFooterActionClosed();
+    }
+
+    private AbsBarOffsetAction getAction(View dependency) {
+        return AbsActionHelper.isClosed(dependency) ? mActionClosed : mActionOpened;
+    }
 
     @Override
     protected void layoutChild(CoordinatorLayout parent, View child, int layoutDirection) {
@@ -46,29 +61,9 @@ public class BarFooterBehavior extends HeaderScrollingViewBehavior {
 
     @Override
     public boolean onDependentViewChanged(CoordinatorLayout parent, View child, View dependency) {
-        offsetChildAsNeeded(parent, child, dependency);
+        getAction(dependency).offsetChildAsNeeded(parent, child, dependency);
         return false;
     }
-
-    private void offsetChildAsNeeded(CoordinatorLayout parent, View child, View dependency) {
-        float childOffsetRange = -getScrollRange(dependency);
-//             float childOffsetRange = -(dependency.getMeasuredHeight() - getFinalTopHeight(dependency));
-        int dependencyOffsetRange = getBarOffsetRange(dependency);
-
-        float childTransY = dependency.getTranslationY() == 0 ? 0 :
-                dependency.getTranslationY() == dependencyOffsetRange ? childOffsetRange :
-                        ((float) Math.floor(dependency.getTranslationY()) / (dependencyOffsetRange * 1.0f) * childOffsetRange);
-        Logger.d(TAG, "offsetChildAsNeeded-> dependency.getTranslationY()=%s, dependencyOffsetRange=%s, childOffsetRange=%s, childTransY=%s",
-                dependency.getTranslationY(), dependencyOffsetRange, childOffsetRange, childTransY);
-
-        if (Math.abs(childTransY) > Math.abs(childOffsetRange)) {
-            childTransY = childOffsetRange;
-        }
-        Logger.d(TAG, "offsetChildAsNeeded-> real childTransY=%s", childTransY);
-        ViewCompat.setTranslationY(child, childTransY);
-
-    }
-
 
     @Override
     protected View findFirstDependency(List<View> views) {
@@ -83,24 +78,10 @@ public class BarFooterBehavior extends HeaderScrollingViewBehavior {
     @Override
     protected int getScrollRange(View v) {
         if (isDependOn(v)) {
-            return Math.max(0, v.getMeasuredHeight() - getFinalTopHeight(v));
+            return Math.max(0, v.getMeasuredHeight() - AbsActionHelper.getHeaderHeight(v));
         } else {
             return super.getScrollRange(v);
         }
-    }
-
-    private int getBarOffsetRange(View dependency) {
-        if (dependency instanceof UcNewsBarLayout) {
-            return ((UcNewsBarLayout) dependency).getBarOffsetRange();
-        }
-        return 0;
-    }
-
-    private int getFinalTopHeight(View dependency) {
-        if (dependency instanceof UcNewsBarLayout) {
-            return ((UcNewsBarLayout) dependency).getHeaderHeight();
-        }
-        return 0;
     }
 
 

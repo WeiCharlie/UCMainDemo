@@ -16,6 +16,7 @@ import com.kido.ucmaindemo.widget.main.behavior.BarBehavior;
 import com.kido.ucmaindemo.widget.main.behavior.BarFollowerBehavior;
 import com.kido.ucmaindemo.widget.main.behavior.BarFooterBehavior;
 import com.kido.ucmaindemo.widget.main.behavior.BarHeaderBehavior;
+import com.kido.ucmaindemo.widget.main.behavior.action.AbsBarAction;
 
 
 /**
@@ -127,7 +128,7 @@ public class UcNewsBarLayout extends FrameLayout {
                 final CoordinatorLayout.LayoutParams coParams = (CoordinatorLayout.LayoutParams) getLayoutParams();
                 if (coParams.getBehavior() instanceof BarBehavior) {
                     mBehavior = (BarBehavior) coParams.getBehavior();
-                    mBehavior.setPagerStateListener(new BarBehavior.OnPagerStateListener() {
+                    mBehavior.addPagerStateListener(new AbsBarAction.OnPagerStateListener() {
                         @Override
                         public void onBarStartClosing() {
                             if (mBarStateListener != null) {
@@ -214,13 +215,13 @@ public class UcNewsBarLayout extends FrameLayout {
 
     public void openBar() {
         if (mBehavior != null) {
-            mBehavior.openPager();
+            mBehavior.open();
         }
     }
 
     public void closeBar() {
         if (mBehavior != null) {
-            mBehavior.closePager();
+            mBehavior.close();
         }
     }
 
@@ -235,7 +236,7 @@ public class UcNewsBarLayout extends FrameLayout {
     /**
      * callback for HeaderPager 's state
      */
-    public interface OnBarStateListener extends BarBehavior.OnPagerStateListener {
+    public interface OnBarStateListener extends AbsBarAction.OnPagerStateListener {
     }
 
 
