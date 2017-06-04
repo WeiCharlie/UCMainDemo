@@ -42,4 +42,13 @@ public class AbsActionHelper {
         }
         return false;
     }
+
+
+    public static boolean isTryingToOpen(View dependency) {
+        if (dependency instanceof UcNewsBarLayout) {
+            UcNewsBarLayout barLayout = ((UcNewsBarLayout) dependency);
+            return barLayout.getBehavior() != null && barLayout.getBehavior().isTryingToOpen();
+        }
+        return false;
+    }
 }

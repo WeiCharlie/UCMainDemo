@@ -87,13 +87,18 @@ public abstract class AbsBarAction {
         return isClosed;
     }
 
+    protected boolean isStarted(View child) {
+        boolean isClosed = child.getTranslationY() == getStartTransY(child);
+        return isClosed;
+    }
+
     public boolean isClosed() {
         return mCurState == STATE_CLOSED;
     }
 
     private void changeState(int newState) {
         Logger.d(TAG, "changeState-> newState=%s", newState);
-        if (mCurState != newState) {
+//        if (mCurState != newState) {
             mCurState = newState;
             if (mCurState == STATE_OPENED) {
                 for (OnPagerStateListener listener : mPagerStateListeners) {
@@ -104,7 +109,7 @@ public abstract class AbsBarAction {
                     listener.onBarClosed();
                 }
             }
-        }
+//        }
     }
 
     protected boolean canScroll(View child, float pendingDy) {
@@ -123,7 +128,7 @@ public abstract class AbsBarAction {
             mFlingRunnable = null;
         }
         mFlingRunnable = new FlingRunnable(parent, child);
-        if (child.getTranslationY() < getStopTransY(child) * mUpDownDivide) {
+        if (child.getTranslationY() - getStartTransY(child) < (getStopTransY(child) - getStartTransY(child)) * mUpDownDivide) {
             mFlingRunnable.scrollToClosed(mDurationLong);
         } else {
             mFlingRunnable.scrollToOpen(mDurationShort);
@@ -144,7 +149,7 @@ public abstract class AbsBarAction {
     public void openPager(int duration) {
         View child = mChild.get();
         CoordinatorLayout parent = mParent.get();
-        if (isClosed() && child != null) {
+        if (child != null) {
             if (mFlingRunnable != null) {
                 child.removeCallbacks(mFlingRunnable);
                 mFlingRunnable = null;

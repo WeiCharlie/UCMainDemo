@@ -18,8 +18,8 @@ public class BarActionClosed extends BarActionOpened {
 
     public BarActionClosed() {
         mDragRate = 1f;
-        mDurationLong = 100;
-        mDurationShort = 100;
+        mDurationLong = 1;
+        mDurationShort = 1;
         mUpDownDivide = 1f / 2f;
     }
 
@@ -32,13 +32,23 @@ public class BarActionClosed extends BarActionOpened {
 
     @Override
     public boolean onNestedPreFling(CoordinatorLayout coordinatorLayout, View child, View target, float velocityX, float velocityY) {
+//        boolean consumed = !isClosed(child);
+//        Logger.d(TAG, "onNestedPreFling: velocityX=%s, velocityY=%s, consumed=%s", velocityX, velocityY, consumed);
+//        if (consumed) {
+//            mWasNestedFlung = true;
+//            if (velocityY > 0) {
+//                closePager();
+//            } else {
+//                openPager();
+//            }
+//        }
         return false;
     }
 
 
     @Override
     public void onStopNestedScroll(CoordinatorLayout coordinatorLayout, View child, View target) {
-//        super.onStopNestedScroll(coordinatorLayout, child, target);
+//        handleActionUp(coordinatorLayout, child);
     }
 
     @Override

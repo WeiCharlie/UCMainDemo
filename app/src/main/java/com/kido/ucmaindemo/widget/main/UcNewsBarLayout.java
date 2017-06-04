@@ -166,6 +166,10 @@ public class UcNewsBarLayout extends FrameLayout {
         mContext = context;
     }
 
+    public BarBehavior getBehavior() {
+        return mBehavior;
+    }
+
     /**
      * 本layout的header的高度
      *

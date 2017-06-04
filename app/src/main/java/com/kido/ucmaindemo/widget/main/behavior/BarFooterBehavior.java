@@ -44,7 +44,7 @@ public class BarFooterBehavior extends HeaderScrollingViewBehavior {
     }
 
     private AbsBarOffsetAction getAction(View dependency) {
-        return AbsActionHelper.isClosed(dependency) ? mActionClosed : mActionOpened;
+        return !AbsActionHelper.isClosed(dependency) || AbsActionHelper.isTryingToOpen(dependency) ? mActionOpened : mActionClosed;
     }
 
     @Override
