@@ -109,7 +109,7 @@ public abstract class AbsBarAction {
 
     protected boolean canScroll(View child, float pendingDy) {
         int pendingTranslationY = (int) (child.getTranslationY() - pendingDy);
-        if (pendingTranslationY >= getStopTransY(child) && pendingTranslationY <= 0) {
+        if (pendingTranslationY >= getStopTransY(child) && pendingTranslationY <= getStartTransY(child)) {
             return true;
         }
         return false;

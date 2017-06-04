@@ -47,7 +47,8 @@ public class BarActionOpened extends AbsBarAction {
         float dealDis = dy * mDragRate; // 处理过的dis，为了不那么敏感
         Logger.d(TAG, "onNestedPreScroll-> dy=%s, dealDis=%s", dy, dealDis);
         if (!canScroll(child, dealDis)) {
-            ViewCompat.setTranslationY(child, dealDis > 0 ? getStopTransY(child) : 0);
+//            ViewCompat.setTranslationY(child, dealDis > 0 ? getStopTransY(child) : 0);
+            dy = 0;
         } else {
             ViewCompat.setTranslationY(child, child.getTranslationY() - dealDis);
         }
