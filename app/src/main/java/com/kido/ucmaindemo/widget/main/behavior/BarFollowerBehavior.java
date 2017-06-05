@@ -10,6 +10,7 @@ import android.view.View;
 import com.kido.ucmaindemo.utils.Logger;
 import com.kido.ucmaindemo.widget.main.UcNewsBarLayout;
 import com.kido.ucmaindemo.widget.main.base.HeaderScrollingViewBehavior;
+import com.kido.ucmaindemo.widget.main.helper.BarHelper;
 
 import java.util.List;
 
@@ -43,19 +44,16 @@ public class BarFollowerBehavior extends HeaderScrollingViewBehavior {
     }
 
     private void offsetChildAsNeeded(CoordinatorLayout parent, View child, View dependency) {
-        int dependencyOffsetRange = getBarOffsetRange(dependency);
+        int dependencyOffsetRange = BarHelper.getBarOffsetRange(dependency);
         float childOffsetRange = -getScrollRange(dependency);
 
         float childTransY = dependency.getTranslationY() == 0 ? 0 :
                 dependency.getTranslationY() == dependencyOffsetRange ? childOffsetRange :
-                        ((float) Math.floor(dependency.getTranslationY()) / (dependencyOffsetRange * 1.0f) * childOffsetRange);
-        Logger.d(TAG, "offsetChildAsNeeded-> dependency.getTranslationY()=%s, dependencyOffsetRange=%s, childOffsetRange=%s, childTransY=%s",
-                dependency.getTranslationY(), dependencyOffsetRange, childOffsetRange, childTransY);
-        if (Math.abs(childTransY) > Math.abs(childOffsetRange)) {
-            childTransY = childOffsetRange;
-        }
-        Logger.d(TAG, "offsetChildAsNeeded-> real childTransY=%s", childTransY);
-        ViewCompat.setTranslationY(child, childTransY);
+                        (dependency.getTranslationY() / (dependencyOffsetRange * 1.0f) * childOffsetRange);
+        float realChildTransY = BarHelper.ensureValueInRange(childTransY, 0, childOffsetRange);
+        Logger.d(TAG, "offsetChildAsNeeded-> dependency.getTranslationY()=%s, dependencyOffsetRange=%s, childOffsetRange=%s, childTransY=%s, realChildTransY=%s",
+                dependency.getTranslationY(), dependencyOffsetRange, childOffsetRange, childTransY, realChildTransY);
+        ViewCompat.setTranslationY(child, realChildTransY);
     }
 
 
@@ -72,25 +70,10 @@ public class BarFollowerBehavior extends HeaderScrollingViewBehavior {
     @Override
     protected int getScrollRange(View v) {
         if (isDependOn(v)) {
-            return Math.max(0, v.getMeasuredHeight() - getFinalTopHeight(v));
+            return Math.max(0, v.getMeasuredHeight() - BarHelper.getHeaderHeight(v) - BarHelper.getFooterHeight(v));
         } else {
             return super.getScrollRange(v);
         }
-    }
-
-    private int getBarOffsetRange(View dependency) {
-        if (dependency instanceof UcNewsBarLayout) {
-            return ((UcNewsBarLayout) dependency).getBarOffsetRange();
-        }
-        return 0;
-    }
-
-    private int getFinalTopHeight(View dependency) {
-        if (dependency instanceof UcNewsBarLayout) {
-            UcNewsBarLayout barLayout = ((UcNewsBarLayout) dependency);
-            return barLayout.getHeaderHeight() + barLayout.getFooterHeight();
-        }
-        return 0;
     }
 
 

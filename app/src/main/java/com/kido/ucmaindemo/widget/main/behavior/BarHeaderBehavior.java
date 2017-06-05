@@ -8,6 +8,7 @@ import android.view.View;
 
 import com.kido.ucmaindemo.utils.Logger;
 import com.kido.ucmaindemo.widget.main.UcNewsBarLayout;
+import com.kido.ucmaindemo.widget.main.helper.BarHelper;
 
 /**
  * Behavior for Bar Header.
@@ -49,36 +50,17 @@ public class BarHeaderBehavior extends CoordinatorLayout.Behavior<View> {
     }
 
     private void offsetChildAsNeeded(CoordinatorLayout parent, View child, View dependency) {
-        int dependencyOffsetRange = getBarOffsetRange(dependency);
-        int childOffsetRange = getTitleOffsetRange(dependency);
+        int dependencyOffsetRange = BarHelper.getBarOffsetRange(dependency);
+        int childOffsetRange = BarHelper.getHeaderHeight(dependency);
 
         float childTransY = dependency.getTranslationY() == 0 ? 0 :
                 dependency.getTranslationY() == dependencyOffsetRange ? childOffsetRange :
-                        ((float) Math.floor(dependency.getTranslationY()) / (dependencyOffsetRange * 1.0f) * childOffsetRange);
-        Logger.d(TAG, "offsetChildAsNeeded-> dependency.getTranslationY()=%s, dependencyOffsetRange=%s, childOffsetRange=%s, childTransY=%s",
-                dependency.getTranslationY(), dependencyOffsetRange, childOffsetRange, childTransY);
-        if (Math.abs(childTransY) > Math.abs(childOffsetRange)) {
-            childTransY = childOffsetRange;
-        }
-        Logger.d(TAG, "offsetChildAsNeeded-> real childTransY=%s", childTransY);
-        ViewCompat.setTranslationY(child, childTransY);
-
+                        (dependency.getTranslationY() / (dependencyOffsetRange * 1.0f) * childOffsetRange);
+        float realChildTransY = BarHelper.ensureValueInRange(childTransY, 0, childOffsetRange);
+        Logger.d(TAG, "offsetChildAsNeeded-> dependency.getTranslationY()=%s, dependencyOffsetRange=%s, childOffsetRange=%s, childTransY=%s, realChildTransY=%s",
+                dependency.getTranslationY(), dependencyOffsetRange, childOffsetRange, childTransY, realChildTransY);
+        ViewCompat.setTranslationY(child, realChildTransY);
     }
-
-    private int getBarOffsetRange(View dependency) {
-        if (dependency instanceof UcNewsBarLayout) {
-            return ((UcNewsBarLayout) dependency).getBarOffsetRange();
-        }
-        return 0;
-    }
-
-    private int getTitleOffsetRange(View dependency) {
-        if (dependency instanceof UcNewsBarLayout) {
-            return ((UcNewsBarLayout) dependency).getHeaderHeight();
-        }
-        return 0;
-    }
-
 
     private boolean isDependOn(View dependency) {
         return dependency instanceof UcNewsBarLayout;

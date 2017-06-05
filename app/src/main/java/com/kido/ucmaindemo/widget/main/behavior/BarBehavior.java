@@ -9,8 +9,8 @@ import android.view.View;
 import android.widget.OverScroller;
 
 import com.kido.ucmaindemo.utils.Logger;
-import com.kido.ucmaindemo.widget.main.UcNewsBarLayout;
 import com.kido.ucmaindemo.widget.main.base.ViewOffsetBehavior;
+import com.kido.ucmaindemo.widget.main.helper.BarHelper;
 
 import java.lang.ref.WeakReference;
 
@@ -115,7 +115,7 @@ public class BarBehavior extends ViewOffsetBehavior {
         float dealDis = dy * DRAG_RATE; // 处理过的dis，为了不那么敏感
         Logger.d(TAG, "onNestedPreScroll-> dy=%s, dealDis=%s", dy, dealDis);
         if (!canScroll(child, dealDis)) {
-            ViewCompat.setTranslationY(child, dealDis > 0 ? getBarOffsetRange(child) : 0);
+            ViewCompat.setTranslationY(child, dealDis > 0 ? BarHelper.getBarOffsetRange(child) : 0);
         } else {
             ViewCompat.setTranslationY(child, child.getTranslationY() - dealDis);
         }
@@ -134,15 +134,8 @@ public class BarBehavior extends ViewOffsetBehavior {
         mWasNestedFlung = false;
     }
 
-    private int getBarOffsetRange(View child) {
-        if (child instanceof UcNewsBarLayout) {
-            return ((UcNewsBarLayout) child).getBarOffsetRange();
-        }
-        return 0;
-    }
-
     private boolean isClosed(View child) {
-        boolean isClosed = child.getTranslationY() <= getBarOffsetRange(child);
+        boolean isClosed = child.getTranslationY() <= BarHelper.getBarOffsetRange(child);
         return isClosed;
     }
 
@@ -168,7 +161,7 @@ public class BarBehavior extends ViewOffsetBehavior {
 
     private boolean canScroll(View child, float pendingDy) {
         int pendingTranslationY = (int) (child.getTranslationY() - pendingDy);
-        if (pendingTranslationY >= getBarOffsetRange(child) && pendingTranslationY <= 0) {
+        if (pendingTranslationY >= BarHelper.getBarOffsetRange(child) && pendingTranslationY <= 0) {
             return true;
         }
         return false;
@@ -182,7 +175,7 @@ public class BarBehavior extends ViewOffsetBehavior {
             mFlingRunnable = null;
         }
         mFlingRunnable = new FlingRunnable(parent, child);
-        if (child.getTranslationY() < getBarOffsetRange(child) * UP_DOWN_DIVIDE) {
+        if (child.getTranslationY() < BarHelper.getBarOffsetRange(child) * UP_DOWN_DIVIDE) {
             mFlingRunnable.scrollToClosed(DURATION_SHORT);
         } else {
             mFlingRunnable.scrollToOpen(DURATION_SHORT);
@@ -252,7 +245,7 @@ public class BarBehavior extends ViewOffsetBehavior {
         }
 
         public void scrollToClosed(int duration) {
-            int barOffset = getBarOffsetRange(mLayout);
+            int barOffset = BarHelper.getBarOffsetRange(mLayout);
             float curTranslationY = ViewCompat.getTranslationY(mLayout);
             float dy = barOffset - curTranslationY;
 
