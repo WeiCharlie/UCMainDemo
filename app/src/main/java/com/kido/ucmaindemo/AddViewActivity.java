@@ -101,7 +101,7 @@ public class AddViewActivity extends AppCompatActivity {
         });
     }
 
-    private void gotoUcNews() { //测试代码
+    private void gotoUcNews() { //测试代码，仅供模拟测试
         try {
             mRootContainer.removeView(mRefreshLayout);
             if (mOnlyUcNewsLayout != null) {
@@ -122,7 +122,7 @@ public class AddViewActivity extends AppCompatActivity {
 
     }
 
-    private void gobackHome() { //测试代码
+    private void gobackHome() { //测试代码，仅供模拟测试
         new Handler().post(new Runnable() {
             @Override
             public void run() {
