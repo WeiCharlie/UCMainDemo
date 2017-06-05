@@ -17,7 +17,7 @@ import com.kido.ucmaindemo.utils.Logger;
  * 支持嵌套滑动的ListView
  * <p>
  * 通过查看AbsListView源码，发现其已对嵌套滑动做了一些处理，但是是api21的时候才加的。
- * <p>为了兼容api21之前达到嵌套滑动的效果，此处针对api21之前的情况重写了onTouchEvent事件。</>
+ * <p>为了兼容api21之前达到嵌套滑动的效果，此处针对api21之前的情况重写了onTouchEvent事件。
  *
  * @author Kido
  */
