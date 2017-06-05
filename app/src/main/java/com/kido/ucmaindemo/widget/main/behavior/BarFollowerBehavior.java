@@ -9,7 +9,7 @@ import android.view.View;
 
 import com.kido.ucmaindemo.utils.Logger;
 import com.kido.ucmaindemo.widget.main.UcNewsBarLayout;
-import com.kido.ucmaindemo.widget.main.helper.HeaderScrollingViewBehavior;
+import com.kido.ucmaindemo.widget.main.base.HeaderScrollingViewBehavior;
 
 import java.util.List;
 

@@ -17,7 +17,7 @@
         app:ksrl_terminal_icon="@drawable/icon_indicator_home">
 
 
-        <com.kido.ucmaindemo.widget.listView.NestedListView5
+        <com.kido.ucmaindemo.widget.listView.NestedListView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />

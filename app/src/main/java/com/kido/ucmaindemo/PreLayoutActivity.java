@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ *  仿UC首页。此处测试代码模拟內嵌信息流页面view的情况。
  * @author Kido
  */
 

@@ -13,7 +13,7 @@ import android.widget.Toast;
 
 import com.kido.ucmaindemo.adapter.ListViewAdapter;
 import com.kido.ucmaindemo.utils.Logger;
-import com.kido.ucmaindemo.widget.listView.NestedListView5;
+import com.kido.ucmaindemo.widget.listView.NestedListView;
 import com.kido.ucmaindemo.widget.refresh.KSwipeRefreshLayout;
 
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ public class NewsTagFragment extends Fragment {
     private static final String KEY_OPENING = "opening";
 
     private NestedScrollView mNestedScrollView;
-    private NestedListView5 mListView;
+    private NestedListView mListView;
     private KSwipeRefreshLayout mRefreshLayout;
 
     private String mTitle = "";
@@ -70,7 +70,7 @@ public class NewsTagFragment extends Fragment {
         mTitle = getArguments().getString(KEY_TITLE);
         mIsOpeningState = getArguments().getBoolean(KEY_OPENING);
 //        mNestedScrollView = (NestedScrollView) rootView.findViewById(R.id.nested_scrollView);
-        mListView = (NestedListView5) rootView.findViewById(R.id.recyclerView);
+        mListView = (NestedListView) rootView.findViewById(R.id.recyclerView);
         mRefreshLayout = (KSwipeRefreshLayout) rootView.findViewById(R.id.refresh_layout);
 //        mListView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
         mRefreshLayout.setOnRefreshListener(new KSwipeRefreshLayout.OnRefreshListener() {

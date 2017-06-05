@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * 信息流頁面
+ *
  * @author Kido
  */
 

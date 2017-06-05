@@ -1,4 +1,4 @@
-package com.kido.ucmaindemo.widget.main.helper;
+package com.kido.ucmaindemo.widget.main.base;
 
 /**
  * Copy from Android design library

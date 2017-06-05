@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 仿UC首页
+ * 仿UC首页。此处测试代码模拟动态添加信息流页面view的情况。
  *
  * @author Kido
  */
@@ -101,7 +101,7 @@ public class AddViewActivity extends AppCompatActivity {
         });
     }
 
-    private void gotoUcNews() {
+    private void gotoUcNews() { //测试代码
         try {
             mRootContainer.removeView(mRefreshLayout);
             if (mOnlyUcNewsLayout != null) {
@@ -116,12 +116,13 @@ public class AddViewActivity extends AppCompatActivity {
             });
             mRootContainer.addView(mOnlyUcNewsLayout, FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
         } catch (Exception e) {
+            e.printStackTrace();
 
         }
 
     }
 
-    private void gobackHome() {
+    private void gobackHome() { //测试代码
         new Handler().post(new Runnable() {
             @Override
             public void run() {
@@ -130,6 +131,7 @@ public class AddViewActivity extends AppCompatActivity {
                     mRootContainer.addView(mRefreshLayout);
                     mBarLayout.openBar();
                 } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         });

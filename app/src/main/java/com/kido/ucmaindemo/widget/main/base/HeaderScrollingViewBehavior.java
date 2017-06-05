@@ -1,4 +1,4 @@
-package com.kido.ucmaindemo.widget.main.helper;
+package com.kido.ucmaindemo.widget.main.base;
 
 import android.content.Context;
 import android.graphics.Rect;

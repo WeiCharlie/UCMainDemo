@@ -10,7 +10,7 @@ import android.widget.OverScroller;
 
 import com.kido.ucmaindemo.utils.Logger;
 import com.kido.ucmaindemo.widget.main.UcNewsBarLayout;
-import com.kido.ucmaindemo.widget.main.helper.ViewOffsetBehavior;
+import com.kido.ucmaindemo.widget.main.base.ViewOffsetBehavior;
 
 import java.lang.ref.WeakReference;
 
